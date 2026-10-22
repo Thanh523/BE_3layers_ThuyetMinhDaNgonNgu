@@ -1,14 +1,30 @@
 // Dữ liệu demo cục bộ cho các chức năng chưa có API ghi tương ứng ở backend.
-import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
+import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { loadData, saveData } from '../services/storage';
 import { deleteFile } from '../services/fileStore';
 
 const DemoDataContext = createContext(null);
+const FAVORITES_KEY_PREFIX = 'saigonecho-user-favorites-v1';
+const HISTORY_KEY_PREFIX = 'saigonecho-user-history-v1';
 export const newId = prefix => `${prefix}_${crypto.randomUUID()}`;
 export const makeSlug = text => text.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/đ/g, 'd').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
 
+function loadUserList(key) {
+  try {
+    const value = JSON.parse(localStorage.getItem(key) || '[]');
+    return Array.isArray(value) ? value : [];
+  } catch (error) {
+    console.warn(`Không đọc được dữ liệu người dùng (${key}):`, error);
+    return [];
+  }
+}
+
 export function DemoDataProvider({ children }) {
   const [data, setData] = useState(loadData);
+  const [accountScope, setAccountScopeState] = useState('guest');
+  const accountScopeRef = useRef('guest');
+  const [favorites, setFavorites] = useState([]);
+  const [history, setHistory] = useState([]);
   const [message, setMessage] = useState('');
   const [messageId, setMessageId] = useState(0);
 
@@ -23,8 +39,63 @@ export function DemoDataProvider({ children }) {
     catch { showMessage('Không lưu được dữ liệu: trình duyệt có thể đang đầy bộ nhớ hoặc tắt lưu trữ.'); }
   }, [data]);
 
+  useEffect(() => {
+    if (accountScope === 'guest') return;
+    try {
+      localStorage.setItem(`${FAVORITES_KEY_PREFIX}:${accountScope}`, JSON.stringify(favorites));
+    } catch (error) {
+      console.error('Không lưu được danh sách địa điểm yêu thích:', error);
+      showMessage('Không lưu được địa điểm yêu thích vào trình duyệt.');
+    }
+  }, [accountScope, favorites]);
+
+  useEffect(() => {
+    if (accountScope === 'guest') return;
+    try {
+      localStorage.setItem(`${HISTORY_KEY_PREFIX}:${accountScope}`, JSON.stringify(history));
+    } catch (error) {
+      console.error('Không lưu được lịch sử nghe:', error);
+      showMessage('Không lưu được lịch sử nghe vào trình duyệt.');
+    }
+  }, [accountScope, history]);
+
   const notify = useCallback(showMessage, []);
   const dismiss = () => setMessage('');
+  const setAccountScope = useCallback((scope) => {
+    const nextScope = scope ? String(scope) : 'guest';
+    if (accountScopeRef.current === nextScope) return;
+    accountScopeRef.current = nextScope;
+    setFavorites(nextScope === 'guest'
+      ? []
+      : loadUserList(`${FAVORITES_KEY_PREFIX}:${nextScope}`));
+    setHistory(nextScope === 'guest'
+      ? []
+      : loadUserList(`${HISTORY_KEY_PREFIX}:${nextScope}`));
+    setAccountScopeState(nextScope);
+  }, []);
+  const toggleFavorite = useCallback((placeId) => {
+    if (accountScope === 'guest') return;
+    setFavorites((current) => {
+      return current.includes(placeId)
+        ? current.filter((id) => id !== placeId)
+        : [...current, placeId];
+    });
+  }, [accountScope]);
+  const addHistory = useCallback((placeId, lang) => {
+    if (accountScope === 'guest') return;
+    const entry = {
+      id: newId('history'),
+      place_id: placeId,
+      lang,
+      time: new Date().toISOString().replace(/Z$/, ''),
+    };
+    setHistory((current) => [entry, ...current].slice(0, 100));
+  }, [accountScope]);
+  const clearHistory = useCallback(() => {
+    if (accountScope === 'guest') return;
+    setHistory([]);
+    showMessage('Đã xóa lịch sử nghe.');
+  }, [accountScope]);
 
   useEffect(() => {
     if (!message) return undefined;
@@ -78,7 +149,24 @@ export function DemoDataProvider({ children }) {
     return { ...old, images: old.images.map(item => orderMap.has(item.id) ? { ...item, order: orderMap.get(item.id) } : item) };
   });
 
-  const value = useMemo(() => ({ data, add, update, remove, removeLocation, removeMedia, setCover, moveImage, notify }), [data, notify]);
+  const value = useMemo(() => ({
+    data,
+    add,
+    update,
+    remove,
+    removeLocation,
+    removeMedia,
+    setCover,
+    moveImage,
+    notify,
+    accountScope,
+    setAccountScope,
+    favorites,
+    toggleFavorite,
+    history,
+    addHistory,
+    clearHistory,
+  }), [data, notify, accountScope, setAccountScope, favorites, toggleFavorite, history, addHistory, clearHistory]);
   return <DemoDataContext.Provider value={value}>{children}{message && <div className="toast" role="status"><span>{message}</span><button onClick={dismiss} aria-label="Đóng thông báo">×</button></div>}</DemoDataContext.Provider>;
 }
 

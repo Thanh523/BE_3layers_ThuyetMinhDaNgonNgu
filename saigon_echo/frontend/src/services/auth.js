@@ -118,3 +118,86 @@ export async function logout() {
     if (!IS_AUTH_DEMO) await request('/admin/auth/logout', { method: 'POST' });
     sessionStorage.removeItem(SESSION_KEY);
 }
+
+export async function getUserSession() {
+    try {
+        const result = await request('/user/auth/me');
+        if (result.user?.role !== 'user') throw new Error('Tài khoản không có quyền người dùng.');
+        return result.user;
+    } catch (error) {
+        if (error.message === 'Phiên đăng nhập đã hết hạn.') return null;
+        throw error;
+    }
+}
+
+export async function loginUser(username, password) {
+    const result = await request('/user/auth/login', {
+        method: 'POST',
+        body: JSON.stringify({ username, password }),
+    });
+    if (result.user?.role !== 'user') throw new Error('Tài khoản không có quyền người dùng.');
+    return result.user;
+}
+
+export async function registerUser(account) {
+    const result = await request('/user/auth/register', {
+        method: 'POST',
+        body: JSON.stringify(account),
+    });
+    if (result.user?.role !== 'user') throw new Error('Không thể tạo phiên người dùng.');
+    return result.user;
+}
+
+export async function logoutUser() {
+    await request('/user/auth/logout', { method: 'POST' });
+}
+
+export function startUserSessionActivity(onExpired) {
+    let lastActivityAt = Date.now();
+    let lastSyncedActivityAt = lastActivityAt;
+    let expired = false;
+
+    function expire() {
+        if (expired) return;
+        expired = true;
+        onExpired();
+    }
+
+    function registerActivity() {
+        if (Date.now() - lastActivityAt >= SESSION_IDLE_TIMEOUT_MS) {
+            expire();
+            return;
+        }
+        lastActivityAt = Date.now();
+    }
+
+    function checkSession() {
+        const now = Date.now();
+        if (now - lastActivityAt >= SESSION_IDLE_TIMEOUT_MS) {
+            expire();
+            return;
+        }
+        if (lastActivityAt > lastSyncedActivityAt) {
+            lastSyncedActivityAt = lastActivityAt;
+            request('/user/auth/activity', { method: 'POST' }).catch((error) => {
+                if (error.message === 'Phiên đăng nhập đã hết hạn.') expire();
+                else console.error('Không thể đồng bộ hoạt động phiên người dùng:', error);
+            });
+        }
+    }
+
+    const activityEvents = ['pointerdown', 'pointermove', 'keydown', 'touchstart', 'wheel'];
+    activityEvents.forEach((eventName) =>
+        window.addEventListener(eventName, registerActivity, { passive: true }),
+    );
+    window.addEventListener('focus', checkSession);
+    const timer = setInterval(checkSession, ACTIVITY_CHECK_INTERVAL_MS);
+
+    return () => {
+        clearInterval(timer);
+        activityEvents.forEach((eventName) =>
+            window.removeEventListener(eventName, registerActivity),
+        );
+        window.removeEventListener('focus', checkSession);
+    };
+}

@@ -1,5 +1,4 @@
-// Khai báo router: dashboard và 5 module quản trị.
-// /tham-quan/:slug là trang xem công khai tối giản để kiểm tra QR, không phải Dashboard.
+// Khai báo router cho trải nghiệm người dùng, các module quản trị và trang QR công khai.
 import { useEffect, useState } from 'react';
 import { Navigate, Route, Routes, useLocation, useNavigate } from 'react-router-dom';
 import AdminLayout from './components/layout/AdminLayout';
@@ -11,6 +10,11 @@ import AudiosPage from './pages/Admin/AudiosPage';
 import QRPage from './pages/Admin/QRPage';
 import PublicPlacePage from './pages/Admin/PublicPlacePage';
 import LoginPage from './pages/Auth/LoginPage';
+import RegisterPage from './pages/Auth/RegisterPage';
+import UserLayout from './layouts/UserLayout';
+import ExplorePage from './pages/User/ExplorePage';
+import SavedPage from './pages/User/SavedPage';
+import HistoryPage from './pages/User/HistoryPage';
 import { getSession, SESSION_EVENT, startSessionActivity } from './services/api';
 
 function RequireAdmin({ children }) {
@@ -39,7 +43,7 @@ function RequireAdmin({ children }) {
     if (status === 'unauthenticated') {
       navigate('/dang-nhap', {
         replace: true,
-        state: { from: location.pathname },
+        state: { from: location.pathname, role: 'admin' },
       });
     }
   }, [location.pathname, navigate, status]);
@@ -48,7 +52,7 @@ function RequireAdmin({ children }) {
     const expireSession = () => {
       navigate('/dang-nhap', {
         replace: true,
-        state: { from: location.pathname, expired: true },
+        state: { from: location.pathname, role: 'admin', expired: true },
       });
     };
     window.addEventListener(SESSION_EVENT, expireSession);
@@ -60,7 +64,7 @@ function RequireAdmin({ children }) {
     return startSessionActivity(() => {
       navigate('/dang-nhap', {
         replace: true,
-        state: { from: location.pathname, expired: true },
+        state: { from: location.pathname, role: 'admin', expired: true },
       });
     });
   }, [location.pathname, navigate, status]);
@@ -90,8 +94,15 @@ function RequireAdmin({ children }) {
 
 export default function App() {
   return <Routes>
-    <Route path="/" element={<Navigate to="/admin/dia-diem" replace />} />
+    <Route path="/" element={<Navigate to="/kham-pha" replace />} />
     <Route path="/dang-nhap" element={<LoginPage />} />
+    <Route path="/dang-ky" element={<RegisterPage />} />
+    <Route element={<UserLayout />}>
+      <Route path="/kham-pha" element={<ExplorePage />} />
+      <Route path="/yeu-thich" element={<SavedPage />} />
+      <Route path="/lich-su" element={<HistoryPage />} />
+      <Route path="/tham-quan/:slug" element={<PublicPlacePage />} />
+    </Route>
     <Route path="/admin" element={<RequireAdmin><AdminLayout /></RequireAdmin>}>
       <Route index element={<Navigate to="tong-quan" replace />} />
       <Route path="tong-quan" element={<DashboardPage />} />
@@ -101,7 +112,6 @@ export default function App() {
       <Route path="am-thanh" element={<AudiosPage />} />
       <Route path="ma-qr" element={<QRPage />} />
     </Route>
-    <Route path="/tham-quan/:slug" element={<PublicPlacePage />} />
-    <Route path="*" element={<Navigate to="/admin/dia-diem" replace />} />
+    <Route path="*" element={<Navigate to="/kham-pha" replace />} />
   </Routes>;
 }

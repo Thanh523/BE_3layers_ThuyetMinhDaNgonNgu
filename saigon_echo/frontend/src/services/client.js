@@ -31,11 +31,12 @@ export async function request(path, options = {}) {
     }
     const data = await response.json().catch(() => ({}));
     if (!response.ok) {
-        if (response.status === 401 && path !== '/admin/auth/login' && path !== '/admin/auth/me')
+        const isAuthRequest = path.startsWith('/admin/auth/') || path.startsWith('/user/auth/');
+        if (response.status === 401 && !isAuthRequest)
             window.dispatchEvent(new Event(SESSION_EVENT));
         throw new Error(
             response.status === 401
-                ? path === '/admin/auth/login'
+                ? path === '/admin/auth/login' || path === '/user/auth/login'
                     ? 'Tên đăng nhập hoặc mật khẩu không đúng.'
                     : 'Phiên đăng nhập đã hết hạn.'
                 : response.status === 403

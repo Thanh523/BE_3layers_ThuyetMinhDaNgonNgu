@@ -1,0 +1,202 @@
+{
+  "planHash": "10421004356e08e98b6c546b5a63f5b0a561df0f6a0bbdfc3b7e52cd6dc527a8",
+  "phase": "standalone",
+  "recordedAtUtc": "2026-10-22T04:06:21.6533023Z",
+  "retryCount": 1,
+  "resetBaseline": false,
+  "complete": true,
+  "result": {
+    "setupSucceeded": true,
+    "setupDurationMs": 27146,
+    "setupFailureOutput": null,
+    "assertions": [
+      {
+        "name": "production-build",
+        "kind": "process",
+        "verificationMethod": "exit-code",
+        "passed": true,
+        "timedOut": false,
+        "skipped": false,
+        "skippedReason": null,
+        "exitCode": 0,
+        "outputSample": "npm warn Unknown env config \u0022scripts-prepend-node-path\u0022. This will stop working in the next major version of npm. See \u0060npm help npmrc\u0060 for supported config options.\r\n\r\n\u003E saigon-echo-admin-frontend@1.0.0 build\r\n\u003E vite build\r\n\r\n\u001B[36mvite v6.4.5 \u001B[32mbuilding for production...\u001B[36m\u001B[39m\r\ntransforming...\r\n\u001B[32m\u2713\u001B[39m 1672 modules transformed.\r\nrendering chunks...\r\ncomputing gzip size...\r\n\u001B[2mdist/\u001B[22m\u001B[32mindex.html                 \u001B[39m\u001B[1m\u001B[2m  0.49 kB\u001B[22m\u001B[1m\u001B[22m\u001B[2m \u2502 gzip:   0.33 kB\u001B[22m\r\n\u001B[2mdist/\u001B[22m\u001B[35massets/index-B69_THm2.css  \u001B[39m\u001B[1m\u001B[2m 43.94 kB\u001B[22m\u001B[1m\u001B[22m\u001B[2m \u2502 gzip:   9.61 kB\u001B[22m\r\n\u001B[2mdist/\u001B[22m\u001B[36massets/index-DdaOvMGo.js   \u001B[39m\u001B[1m\u001B[2m319.98 kB\u001B[22m\u001B[1m\u001B[22m\u001B[2m \u2502 gzip: 100.19 kB\u001B[22m\r\n\u001B[32m\u2713 built in 3.13s\u001B[39m\r\n",
+        "durationMs": 4524
+      },
+      {
+        "name": "tests-pass",
+        "kind": "process",
+        "verificationMethod": "test-results",
+        "passed": true,
+        "timedOut": false,
+        "skipped": false,
+        "skippedReason": null,
+        "exitCode": 0,
+        "outputSample": "npm warn Unknown env config \u0022scripts-prepend-node-path\u0022. This will stop working in the next major version of npm. See \u0060npm help npmrc\u0060 for supported config options.\r\n\r\n\u003E saigon-echo-admin-frontend@1.0.0 test\r\n\u003E vitest run\r\n\r\n\u001B[2m11:06:19 AM\u001B[22m \u001B[33m\u001B[1m[vite]\u001B[22m\u001B[39m \u001B[33mwarning: \u0060esbuild\u0060 option was specified by \u0022vite:react-babel\u0022 plugin. This option is deprecated, please use \u0060oxc\u0060 instead.\u001B[39m\r\n\u001B[2m11:06:19 AM\u001B[22m \u001B[33m\u001B[1m[vite]\u001B[22m\u001B[39m \u001B[33mwarning: \u0060optimizeDeps.esbuildOptions\u0060 option was specified by \u0022vite:react-babel\u0022 plugin. This option is deprecated, please use \u0060optimizeDeps.rolldownOptions\u0060 instead.\u001B[39m\r\n\u001B[33mBoth esbuild and oxc options were set. oxc options will be used and esbuild options will be ignored.\u001B[39m The following esbuild options were set: \u0060{ jsx: \u0027automatic\u0027, jsxImportSource: undefined }\u0060\r\n\r\n RUN  v5.0.5 C:/Users/hauth/OneDrive/T\u00E0i li\u1EC7u/GitHub/BE_3layers_ThuyetMinhDaNgonNgu/saigon_echo/frontend\r\n\r\n\r\n Test Files  1 passed (1)\r\n      Tests  5 passed (5)\r\n   Start at  11:06:19\r\n   Duration  377ms (transform 55%, import 28%, tests 11%, worker 5%)\r\n\r\n",
+        "durationMs": 1973,
+        "testResults": {
+          "testFramework": "vitest",
+          "runnerDetectedFrom": "output_banner",
+          "testsTotal": 5,
+          "testsPassed": 5,
+          "testsFailed": 0,
+          "testsSkipped": 0,
+          "parseFailed": false
+        }
+      },
+      {
+        "name": "login-route-serves",
+        "kind": "http-probe",
+        "verificationMethod": "http-status",
+        "passed": true,
+        "timedOut": false,
+        "skipped": false,
+        "skippedReason": null,
+        "exitCode": null,
+        "outputSample": "HTTP 200\n\u003C!doctype html\u003E\r\n\u003Chtml lang=\u0022vi\u0022\u003E\r\n  \u003Chead\u003E\n    \u003Cscript type=\u0022module\u0022\u003Eimport { injectIntoGlobalHook } from \u0022/@react-refresh\u0022;\ninjectIntoGlobalHook(window);\nwindow.$RefreshReg$ = () =\u003E {};\nwindow.$RefreshSig$ = () =\u003E (type) =\u003E type;\u003C/script\u003E\n\n    \u003Cscript type=\u0022module\u0022 src=\u0022/@vite/client\u0022\u003E\u003C/script\u003E\n\r\n    \u003Cmeta charset=\u0022UTF-8\u0022 /\u003E\r\n    \u003Cmeta name=\u0022viewport\u0022 content=\u0022width=device-width, initial-scale=1.0\u0022 /\u003E\r\n    \u003Cmeta name=\u0022theme-color\u0022 content=\u0022#173e35\u0022 /\u003E\r\n    \u003Ctitle\u003ES\u00E0i G\u00F2n Echo \u2014 Stories Around You\u003C/title\u003E\r\n  \u003C/head\u003E\r\n  \u003Cbody\u003E\r\n    \u003Cdiv id=\u0022root\u0022\u003E\u003C/div\u003E\r\n    \u003Cscript type=\u0022module\u0022 src=\u0022/src/main.jsx\u0022\u003E\u003C/script\u003E\r\n  \u003C/body\u003E\r\n\u003C/html\u003E\r\n\n--- server output ---\nnpm warn Unknown env config \u0022scripts-prepend-node-path\u0022. This will stop working in the next major version of npm. See \u0060npm help npmrc\u0060 for supported config options.\r\n\r\n\u003E saigon-echo-admin-frontend@1.0.0 dev\r\n\u003E vite --host 127.0.0.1 --port 5179\r\n\r\n\r\n  \u001B[32m\u001B[1mVITE\u001B[22m v6.4.5\u001B[39m  \u001B[2mready in \u001B[0m\u001B[1m443\u001B[22m\u001B[2m\u001B[0m ms\u001B[22m\r\n\r\n  \u001B[32m\u279C\u001B[39m  \u001B[1mLocal\u001B[22m:   \u001B[36mhttp://127.0.0.1:\u001B[1m5179\u001B[22m/\u001B[39m\r\n",
+        "durationMs": 1058
+      },
+      {
+        "name": "registration-route-serves",
+        "kind": "http-probe",
+        "verificationMethod": "http-status",
+        "passed": true,
+        "timedOut": false,
+        "skipped": false,
+        "skippedReason": null,
+        "exitCode": null,
+        "outputSample": "HTTP 200\n\u003C!doctype html\u003E\r\n\u003Chtml lang=\u0022vi\u0022\u003E\r\n  \u003Chead\u003E\n    \u003Cscript type=\u0022module\u0022\u003Eimport { injectIntoGlobalHook } from \u0022/@react-refresh\u0022;\ninjectIntoGlobalHook(window);\nwindow.$RefreshReg$ = () =\u003E {};\nwindow.$RefreshSig$ = () =\u003E (type) =\u003E type;\u003C/script\u003E\n\n    \u003Cscript type=\u0022module\u0022 src=\u0022/@vite/client\u0022\u003E\u003C/script\u003E\n\r\n    \u003Cmeta charset=\u0022UTF-8\u0022 /\u003E\r\n    \u003Cmeta name=\u0022viewport\u0022 content=\u0022width=device-width, initial-scale=1.0\u0022 /\u003E\r\n    \u003Cmeta name=\u0022theme-color\u0022 content=\u0022#173e35\u0022 /\u003E\r\n    \u003Ctitle\u003ES\u00E0i G\u00F2n Echo \u2014 Stories Around You\u003C/title\u003E\r\n  \u003C/head\u003E\r\n  \u003Cbody\u003E\r\n    \u003Cdiv id=\u0022root\u0022\u003E\u003C/div\u003E\r\n    \u003Cscript type=\u0022module\u0022 src=\u0022/src/main.jsx\u0022\u003E\u003C/script\u003E\r\n  \u003C/body\u003E\r\n\u003C/html\u003E\r\n\n--- server output ---\nnpm warn Unknown env config \u0022scripts-prepend-node-path\u0022. This will stop working in the next major version of npm. See \u0060npm help npmrc\u0060 for supported config options.\r\n\r\n\u003E saigon-echo-admin-frontend@1.0.0 dev\r\n\u003E vite --host 127.0.0.1 --port 5179\r\n\r\n\r\n  \u001B[32m\u001B[1mVITE\u001B[22m v6.4.5\u001B[39m  \u001B[2mready in \u001B[0m\u001B[1m338\u001B[22m\u001B[2m\u001B[0m ms\u001B[22m\r\n\r\n  \u001B[32m\u279C\u001B[39m  \u001B[1mLocal\u001B[22m:   \u001B[36mhttp://127.0.0.1:\u001B[1m5179\u001B[22m/\u001B[39m\r\n",
+        "durationMs": 1078
+      }
+    ],
+    "executions": [
+      {
+        "source": "setup[0]",
+        "resolvedExecutable": "C:\\Program Files\\nodejs\\npm.cmd",
+        "args": [
+          "ci"
+        ],
+        "cwd": "C:\\Users\\hauth\\OneDrive\\T\u00E0i li\u1EC7u\\GitHub\\BE_3layers_ThuyetMinhDaNgonNgu\\saigon_echo\\frontend",
+        "env": {},
+        "prependPath": [],
+        "platform": "win32",
+        "nodeExecutable": "C:\\Program Files\\nodejs\\node.EXE",
+        "nodeVersion": "v24.21.0",
+        "packageManager": "npm",
+        "packageManagerExecutable": "C:\\Program Files\\nodejs\\npm.cmd",
+        "packageManagerVersion": "11.19.0",
+        "cleanup": {
+          "RootProcessId": 19696,
+          "Completed": true,
+          "ProcessesObserved": 9,
+          "ProcessesTerminated": 1,
+          "Failure": null
+        }
+      },
+      {
+        "source": "production-build",
+        "resolvedExecutable": "C:\\Program Files\\nodejs\\npm.cmd",
+        "args": [
+          "run",
+          "build"
+        ],
+        "cwd": "C:\\Users\\hauth\\OneDrive\\T\u00E0i li\u1EC7u\\GitHub\\BE_3layers_ThuyetMinhDaNgonNgu\\saigon_echo\\frontend",
+        "env": {},
+        "prependPath": [],
+        "platform": "win32",
+        "nodeExecutable": "C:\\Program Files\\nodejs\\node.EXE",
+        "nodeVersion": "v24.21.0",
+        "packageManager": "npm",
+        "packageManagerExecutable": "C:\\Program Files\\nodejs\\npm.cmd",
+        "packageManagerVersion": "11.19.0",
+        "cleanup": {
+          "RootProcessId": 25856,
+          "Completed": true,
+          "ProcessesObserved": 12,
+          "ProcessesTerminated": 1,
+          "Failure": null
+        }
+      },
+      {
+        "source": "tests-pass",
+        "resolvedExecutable": "C:\\Program Files\\nodejs\\npm.cmd",
+        "args": [
+          "test"
+        ],
+        "cwd": "C:\\Users\\hauth\\OneDrive\\T\u00E0i li\u1EC7u\\GitHub\\BE_3layers_ThuyetMinhDaNgonNgu\\saigon_echo\\frontend",
+        "env": {},
+        "prependPath": [],
+        "platform": "win32",
+        "nodeExecutable": "C:\\Program Files\\nodejs\\node.EXE",
+        "nodeVersion": "v24.21.0",
+        "packageManager": "npm",
+        "packageManagerExecutable": "C:\\Program Files\\nodejs\\npm.cmd",
+        "packageManagerVersion": "11.19.0",
+        "cleanup": {
+          "RootProcessId": 8540,
+          "Completed": true,
+          "ProcessesObserved": 13,
+          "ProcessesTerminated": 1,
+          "Failure": null
+        }
+      },
+      {
+        "source": "login-route-serves",
+        "resolvedExecutable": "C:\\Program Files\\nodejs\\npm.cmd",
+        "args": [
+          "run",
+          "dev",
+          "--",
+          "--host",
+          "127.0.0.1",
+          "--port",
+          "5179"
+        ],
+        "cwd": "C:\\Users\\hauth\\OneDrive\\T\u00E0i li\u1EC7u\\GitHub\\BE_3layers_ThuyetMinhDaNgonNgu\\saigon_echo\\frontend",
+        "env": {},
+        "prependPath": [],
+        "platform": "win32",
+        "nodeExecutable": "C:\\Program Files\\nodejs\\node.EXE",
+        "nodeVersion": "v24.21.0",
+        "packageManager": "npm",
+        "packageManagerExecutable": "C:\\Program Files\\nodejs\\npm.cmd",
+        "packageManagerVersion": "11.19.0",
+        "cleanup": {
+          "RootProcessId": 25588,
+          "Completed": true,
+          "ProcessesObserved": 12,
+          "ProcessesTerminated": 6,
+          "Failure": null
+        }
+      },
+      {
+        "source": "registration-route-serves",
+        "resolvedExecutable": "C:\\Program Files\\nodejs\\npm.cmd",
+        "args": [
+          "run",
+          "dev",
+          "--",
+          "--host",
+          "127.0.0.1",
+          "--port",
+          "5179"
+        ],
+        "cwd": "C:\\Users\\hauth\\OneDrive\\T\u00E0i li\u1EC7u\\GitHub\\BE_3layers_ThuyetMinhDaNgonNgu\\saigon_echo\\frontend",
+        "env": {},
+        "prependPath": [],
+        "platform": "win32",
+        "nodeExecutable": "C:\\Program Files\\nodejs\\node.EXE",
+        "nodeVersion": "v24.21.0",
+        "packageManager": "npm",
+        "packageManagerExecutable": "C:\\Program Files\\nodejs\\npm.cmd",
+        "packageManagerVersion": "11.19.0",
+        "cleanup": {
+          "RootProcessId": 5752,
+          "Completed": true,
+          "ProcessesObserved": 12,
+          "ProcessesTerminated": 6,
+          "Failure": null
+        }
+      }
+    ]
+  }
+}

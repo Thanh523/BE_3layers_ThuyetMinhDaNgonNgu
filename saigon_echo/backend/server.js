@@ -4,7 +4,7 @@ import { randomBytes } from 'node:crypto';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { closePool, getPool, sql } from './db.js';
-import { verifyPassword } from './passwords.js';
+import { hashPassword, verifyPassword } from './passwords.js';
 
 dotenv.config({ path: resolve(dirname(fileURLToPath(import.meta.url)), '.env') });
 
@@ -13,29 +13,30 @@ const port = Number(process.env.PORT || 3001);
 const frontendOrigin = process.env.FRONTEND_ORIGIN || 'http://localhost:5173';
 const SESSION_TTL_MS = 30 * 1000;
 const sessions = new Map();
-const SESSION_COOKIE = 'saigon-echo-admin-session';
+const ADMIN_SESSION_COOKIE = 'saigon-echo-admin-session';
+const USER_SESSION_COOKIE = 'saigon-echo-user-session';
 
-function cookieOptions(maxAge) {
+function cookieOptions(maxAge, path) {
     return {
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production',
         sameSite: 'Strict',
-        path: '/api/admin',
+        path,
         ...(maxAge ? { maxAge } : {}),
     };
 }
 
-function getSessionToken(req) {
+function getSessionToken(req, cookieName) {
     const cookie = req.headers.cookie
         ?.split(';')
         .map((entry) => entry.trim())
-        .find((entry) => entry.startsWith(`${SESSION_COOKIE}=`));
-    const token = cookie?.slice(SESSION_COOKIE.length + 1);
+        .find((entry) => entry.startsWith(`${cookieName}=`));
+    const token = cookie?.slice(cookieName.length + 1);
     return token && /^[\da-f]{64}$/i.test(token) ? token : null;
 }
 
-function getCurrentSession(req) {
-    const token = getSessionToken(req);
+function getCurrentSession(req, cookieName = ADMIN_SESSION_COOKIE) {
+    const token = getSessionToken(req, cookieName);
     const session = token ? sessions.get(token) : null;
     if (!session) return null;
     if (session.expiresAt <= Date.now()) {
@@ -128,7 +129,11 @@ app.post('/api/admin/auth/login', async (req, res) => {
                 'UPDATE dbo.AdminAccounts SET LastLoginAt = SYSUTCDATETIME() WHERE AdminId = @adminId',
             );
         sessions.set(token, { user, expiresAt: Date.now() + SESSION_TTL_MS });
-        res.cookie(SESSION_COOKIE, token, cookieOptions(SESSION_TTL_MS));
+        res.cookie(
+            ADMIN_SESSION_COOKIE,
+            token,
+            cookieOptions(SESSION_TTL_MS, '/api/admin'),
+        );
         return res.json({ user });
     } catch (error) {
         console.error('Admin login failed:', error);
@@ -136,6 +141,154 @@ app.post('/api/admin/auth/login', async (req, res) => {
             message: 'Không thể đăng nhập. Kiểm tra kết nối và cấu trúc dbo.AdminAccounts.',
         });
     }
+});
+
+app.post('/api/user/auth/register', async (req, res) => {
+    const { username, email, fullName, password } = req.body || {};
+    const normalizedUsername = typeof username === 'string' ? username.trim() : '';
+    const normalizedEmail = typeof email === 'string' ? email.trim().toLowerCase() : '';
+    const normalizedFullName = typeof fullName === 'string' ? fullName.trim() : '';
+    if (
+        !/^[\p{L}\p{N}_.-]{3,50}$/u.test(normalizedUsername) ||
+        normalizedEmail.length > 254 ||
+        !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(normalizedEmail) ||
+        !normalizedFullName ||
+        normalizedFullName.length > 100 ||
+        typeof password !== 'string' ||
+        password.length < 12 ||
+        password.length > 128
+    ) {
+        return res.status(400).json({
+            message:
+                'Thông tin chưa hợp lệ. Tên đăng nhập 3–50 ký tự, email đúng định dạng, họ tên tối đa 100 ký tự và mật khẩu từ 12–128 ký tự.',
+        });
+    }
+
+    try {
+        const passwordHash = await hashPassword(password);
+        const pool = await getPool();
+        const result = await pool
+            .request()
+            .input('username', sql.NVarChar(50), normalizedUsername)
+            .input('email', sql.NVarChar(254), normalizedEmail)
+            .input('fullName', sql.NVarChar(100), normalizedFullName)
+            .input('passwordHash', sql.NVarChar(512), passwordHash).query(`
+                INSERT INTO dbo.UserAccounts (Username, Email, FullName, PasswordHash)
+                OUTPUT INSERTED.UserId, INSERTED.Username, INSERTED.Email, INSERTED.FullName
+                VALUES (@username, @email, @fullName, @passwordHash)
+            `);
+        const account = result.recordset[0];
+        const token = randomBytes(32).toString('hex');
+        const user = {
+            id: account.UserId,
+            name: account.FullName,
+            username: account.Username,
+            email: account.Email,
+            role: 'user',
+        };
+        sessions.set(token, { user, expiresAt: Date.now() + SESSION_TTL_MS });
+        res.cookie(
+            USER_SESSION_COOKIE,
+            token,
+            cookieOptions(SESSION_TTL_MS, '/api/user'),
+        );
+        return res.status(201).json({ user });
+    } catch (error) {
+        if (error.number === 2601 || error.number === 2627) {
+            return res.status(409).json({
+                message: 'Tên đăng nhập hoặc email đã được sử dụng.',
+            });
+        }
+        console.error('User registration failed:', error);
+        return res.status(500).json({
+            message: 'Không thể tạo tài khoản. Kiểm tra kết nối và cấu trúc dbo.UserAccounts.',
+        });
+    }
+});
+
+app.post('/api/user/auth/login', async (req, res) => {
+    const { username, password } = req.body || {};
+    if (
+        typeof username !== 'string' ||
+        typeof password !== 'string' ||
+        !username.trim() ||
+        !password ||
+        username.length > 100 ||
+        password.length > 1024
+    ) {
+        return res.status(400).json({ message: 'Vui lòng nhập tên đăng nhập và mật khẩu hợp lệ.' });
+    }
+
+    try {
+        const pool = await getPool();
+        const result = await pool
+            .request()
+            .input('username', sql.NVarChar(50), username.trim()).query(`
+                SELECT TOP (1) UserId, Username, Email, FullName, PasswordHash, IsActive
+                FROM dbo.UserAccounts
+                WHERE Username = @username
+                  AND IsActive = 1
+                ORDER BY UserId
+            `);
+        const account = result.recordset[0];
+        if (!account || !(await verifyPassword(password, account.PasswordHash))) {
+            return res.status(401).json({ message: 'Tên đăng nhập hoặc mật khẩu không đúng.' });
+        }
+
+        const token = randomBytes(32).toString('hex');
+        const user = {
+            id: account.UserId,
+            name: account.FullName,
+            username: account.Username,
+            email: account.Email,
+            role: 'user',
+        };
+        await pool
+            .request()
+            .input('userId', sql.Int, account.UserId)
+            .query(
+                'UPDATE dbo.UserAccounts SET LastLoginAt = SYSUTCDATETIME(), UpdatedAt = SYSUTCDATETIME() WHERE UserId = @userId',
+            );
+        sessions.set(token, { user, expiresAt: Date.now() + SESSION_TTL_MS });
+        res.cookie(
+            USER_SESSION_COOKIE,
+            token,
+            cookieOptions(SESSION_TTL_MS, '/api/user'),
+        );
+        return res.json({ user });
+    } catch (error) {
+        console.error('User login failed:', error);
+        return res.status(500).json({
+            message: 'Không thể đăng nhập. Kiểm tra kết nối và cấu trúc dbo.UserAccounts.',
+        });
+    }
+});
+
+app.get('/api/user/auth/me', (req, res) => {
+    const session = getCurrentSession(req, USER_SESSION_COOKIE);
+    if (!session) return res.status(401).json({ message: 'Phiên đăng nhập đã hết hạn.' });
+    return res.json({ user: session.user });
+});
+
+app.post('/api/user/auth/activity', (req, res) => {
+    const session = getCurrentSession(req, USER_SESSION_COOKIE);
+    if (!session) return res.status(401).json({ message: 'Phiên đăng nhập đã hết hạn.' });
+
+    const expiresAt = Date.now() + SESSION_TTL_MS;
+    sessions.set(session.token, { user: session.user, expiresAt });
+    res.cookie(
+        USER_SESSION_COOKIE,
+        session.token,
+        cookieOptions(SESSION_TTL_MS, '/api/user'),
+    );
+    return res.sendStatus(204);
+});
+
+app.post('/api/user/auth/logout', (req, res) => {
+    const session = getCurrentSession(req, USER_SESSION_COOKIE);
+    if (session) sessions.delete(session.token);
+    res.clearCookie(USER_SESSION_COOKIE, cookieOptions(undefined, '/api/user'));
+    return res.sendStatus(204);
 });
 
 app.get('/api/admin/auth/me', (req, res) => {
@@ -150,14 +303,18 @@ app.post('/api/admin/auth/activity', (req, res) => {
 
     const expiresAt = Date.now() + SESSION_TTL_MS;
     sessions.set(session.token, { user: session.user, expiresAt });
-    res.cookie(SESSION_COOKIE, session.token, cookieOptions(SESSION_TTL_MS));
+    res.cookie(
+        ADMIN_SESSION_COOKIE,
+        session.token,
+        cookieOptions(SESSION_TTL_MS, '/api/admin'),
+    );
     return res.sendStatus(204);
 });
 
 app.post('/api/admin/auth/logout', (req, res) => {
     const session = getCurrentSession(req);
     if (session) sessions.delete(session.token);
-    res.clearCookie(SESSION_COOKIE, cookieOptions());
+    res.clearCookie(ADMIN_SESSION_COOKIE, cookieOptions(undefined, '/api/admin'));
     return res.sendStatus(204);
 });
 

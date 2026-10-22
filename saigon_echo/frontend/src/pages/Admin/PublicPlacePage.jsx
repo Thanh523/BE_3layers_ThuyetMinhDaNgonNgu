@@ -7,10 +7,10 @@ import { LANGUAGE_OPTIONS } from '../../data/seed';
 import MediaImage from '../../components/shared/MediaImage';
 import useFileUrl from '../../hooks/useFileUrl';
 
-function NarrationAudio({ audio }) {
+function NarrationAudio({ audio, onPlay }) {
     const url = useFileUrl(audio?.fileId);
     return url ? (
-        <audio className="full-audio" controls src={url} preload="metadata" />
+        <audio className="full-audio" controls src={url} preload="metadata" onPlay={onPlay} />
     ) : (
         <p className="helper">Hiện chưa có bản thu âm thanh cho ngôn ngữ này.</p>
     );
@@ -18,7 +18,7 @@ function NarrationAudio({ audio }) {
 
 export default function PublicPlacePage() {
     const { slug } = useParams();
-    const { data } = useDemoData();
+    const { data, addHistory } = useDemoData();
     const [lang, setLang] = useState('vi');
     const place = data.locations.find((item) => item.slug === slug);
     const narration = useMemo(
@@ -39,8 +39,8 @@ export default function PublicPlacePage() {
             <div className="not-found">
                 <h1>Địa điểm chưa sẵn sàng</h1>
                 <p>Địa điểm không tồn tại hoặc đang được ẩn bởi quản trị viên.</p>
-                <Link className="btn" to="/admin/dia-diem">
-                    Về trang quản trị
+                <Link className="btn" to="/kham-pha">
+                    Về trang khám phá
                 </Link>
             </div>
         );
@@ -53,8 +53,8 @@ export default function PublicPlacePage() {
                         Sài Gòn Echo<small>STORIES AROUND YOU</small>
                     </strong>
                 </div>
-                <Link to="/admin/dia-diem" className="btn small">
-                    <ArrowLeft size={15} /> Admin demo
+                <Link to="/kham-pha" className="btn small">
+                    <ArrowLeft size={15} /> Khám phá
                 </Link>
             </header>
             <main className="public-container">
@@ -94,7 +94,10 @@ export default function PublicPlacePage() {
                     <h2>
                         <AudioLines size={24} /> Nghe thuyết minh
                     </h2>
-                    <NarrationAudio audio={audio} />
+                    <NarrationAudio
+                        audio={audio}
+                        onPlay={() => addHistory(place.id, lang)}
+                    />
                 </section>
                 <div className="demo-disclaimer">
                     Trang tham quan hiện sử dụng dữ liệu demo lưu trên trình duyệt; nội dung chưa

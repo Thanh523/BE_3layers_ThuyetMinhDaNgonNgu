@@ -1,5 +1,15 @@
 // API công khai tập trung; cài đặt request và endpoint nằm trong services riêng.
-export { getSession, login, logout, startSessionActivity } from './auth';
+export {
+    getSession,
+    getUserSession,
+    login,
+    loginUser,
+    logout,
+    logoutUser,
+    registerUser,
+    startSessionActivity,
+    startUserSessionActivity,
+} from './auth';
 export { getDashboard } from './dashboard';
 export {
     createNarration,
