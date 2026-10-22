@@ -1,0 +1,191 @@
+[
+ {
+  "id": "dinh-doc-lap",
+  "name": "Dinh Độc Lập",
+  "enName": "Independence Palace",
+  "category": "historyCat",
+  "address": "135 Nam Kỳ Khởi Nghĩa, TP.HCM",
+  "lat": 10.777,
+  "lon": 106.6954,
+  "art": "palace",
+  "color": "#d5ded0",
+  "published": true,
+  "source": "https://dinhdoclap.gov.vn/kien-truc-dinh-doc-lap/",
+  "texts": {
+   "vi": "Chào mừng bạn đến với Dinh Độc Lập. Giữa trung tâm Thành phố Hồ Chí Minh, công trình này mang dấu ấn của kiến trúc sư Ngô Viết Thụ. Những đường nét hiện đại kết hợp với chi tiết gợi nhắc văn hóa truyền thống Việt Nam. Hãy quan sát lớp rèm hoa đá ở mặt đứng: hình dáng của nó gợi liên tưởng đến những đốt trúc. Khi bước qua khuôn viên rợp bóng cây, bạn có thể cảm nhận sự yên tĩnh khác hẳn nhịp phố bên ngoài.",
+   "en": "Welcome to the Independence Palace in Ho Chi Minh City. Designed by architect Ngo Viet Thu, the building brings modern architecture together with Vietnamese cultural references. Look closely at the stone screens across the facade, inspired by the shape of bamboo. The green grounds create a quiet setting in the heart of a busy city. Take a moment to observe the balance between the building, its gardens and the surrounding space.",
+   "ja": "ホーチミン市の統一会堂へようこそ。建築家ゴー・ヴィエット・トゥーが設計したこの建物は、近代建築とベトナムの伝統的な文化を組み合わせています。正面にある石の装飾は、竹を思わせる形をしています。緑豊かな庭を歩きながら、建物と自然の調和を感じてみてください。",
+   "zh": "欢迎来到胡志明市的独立宫。这座建筑将现代建筑与越南传统文化元素结合在一起，绿色庭院让市中心多了一份宁静。",
+   "ko": "호짜민시 통일궁에 오신 것을 환영합니다. 현대 건축과 베트남 전통문화가 조화를 이루며, 푸른 정원은 도심 속의 평온함을 느끼게 합니다."
+  },
+  "audio": {}
+ },
+ {
+  "id": "buu-dien",
+  "name": "Bưu điện Thành phố",
+  "enName": "Saigon Central Post Office",
+  "category": "architecture",
+  "address": "2 Công xã Paris, TP.HCM",
+  "lat": 10.7799,
+  "lon": 106.6999,
+  "art": "post",
+  "color": "#ead5a7",
+  "published": true,
+  "source": "https://visithcmc.net/en/news/du-lich-quan-1",
+  "texts": {
+   "vi": "Bạn đang đứng trước Bưu điện Thành phố, một điểm nhấn kiến trúc quen thuộc ở trung tâm Sài Gòn. Mặt tiền màu vàng và các ô cửa tạo nên vẻ trang nhã, dễ nhận ra giữa khu phố. Bên trong là không gian sảnh rộng với hệ mái vòm cao. Ngoài việc ngắm kiến trúc, bạn có thể tìm hiểu hoạt động bưu chính và lựa chọn một tấm bưu thiếp để lưu lại kỷ niệm về thành phố.",
+   "en": "Welcome to the Saigon Central Post Office. Its yellow facade and tall windows make it a distinctive landmark in the city centre. Inside, the spacious hall and high vaulted ceiling invite you to look up and explore. Beyond its architectural appeal, the building connects visitors with the tradition of sending letters and postcards. A postcard can become a small, personal memory of your journey through Saigon.",
+   "ja": "サイゴン中央郵便局へようこそ。黄色い外観と高い窓が印象的な建物です。内部には広いホールと高いアーチ形の天井があります。建築を楽しんだ後は、旅の記念に絵はがきを選んでみてはいかがでしょうか。",
+   "zh": "西贡中央邮局以黄色外墙和高窗户闻名。走进宽敞的大厅，抬头欣赏拱形屋顶，也可以挑选一张明信片留下旅途记忆。",
+   "ko": "사이공 중앙우체국은 노란 외관과 높은 창문으로 유명합니다. 넓은 홀과 높은 아치형 천장을 둘러보고 여행의 추억으로 엽서를 골라 보세요."
+  },
+  "audio": {}
+ },
+ {
+  "id": "cho-ben-thanh",
+  "name": "Chợ Bến Thành",
+  "enName": "Ben Thanh Market",
+  "category": "culture",
+  "address": "Đường Lê Lợi, khu vực Bến Thành, TP.HCM",
+  "lat": 10.7725,
+  "lon": 106.698,
+  "art": "market",
+  "color": "#e9c5ad",
+  "published": true,
+  "source": "https://visithcmc.vn/vi/kham-pha-cho-ben-thanh-tphcm-tu-a-z-5-phut-doc/",
+  "texts": {
+   "vi": "Chợ Bến Thành là một không gian mua bán gắn liền với hình ảnh Sài Gòn. Điểm dễ nhận biết của chợ là tháp đồng hồ ở cửa chính. Trong các lối đi, bạn có thể bắt gặp hàng lưu niệm, đồ thủ công và nhiều món ăn Việt Nam. Hãy đi chậm để quan sát màu sắc của các quầy hàng và cảm nhận âm thanh của một khu chợ đang hoạt động. Khi mua sắm, bạn nên hỏi giá trước để lựa chọn phù hợp.",
+   "en": "Ben Thanh Market is closely associated with the image of Saigon. Its clock tower is a familiar meeting point. Inside, the aisles bring together souvenirs, handicrafts and Vietnamese food. Walk slowly and notice the colours, sounds and daily exchanges that give the market its character. If you decide to buy something, ask about the price first and choose at your own pace.",
+   "ja": "ベンタイン市場はサイゴンを象徴する場所の一つです。入口の時計塔が目印になっています。市場の中には、お土産や手工芸品、ベトナム料理の店が並んでいます。色や音を楽しみながら歩いてみましょう。買い物をする時は、先に値段を確認してください。",
+   "zh": "滨城市场是西贡生活气息浓厚的地方，入口的钟楼是醒目的标志。慢慢走过摊位，感受纪念品、手工艺品和越南美食的色彩与声音。",
+   "ko": "벤탄 시장은 사이공의 활기찮c 일상을 느낄 수 있는 곳이며 입구의 시계탑이 대표적인 표지입니다. 기념품과 수공예품, 베트남 음식이 있는 통로를 천천히 둘러보세요."
+  },
+  "audio": {}
+ },
+ {
+  "id": "nha-hat",
+  "name": "Nhà hát Thành phố",
+  "enName": "Saigon Opera House",
+  "category": "architecture",
+  "address": "7 Công trường Lam Sơn, TP.HCM",
+  "lat": 10.7766,
+  "lon": 106.7032,
+  "art": "opera",
+  "color": "#d8d8cd",
+  "published": true,
+  "source": "https://visithcmc.vn/vi/tin-tuc/top-20-places-you-need-to-visit-in-ho-chi-minh-city",
+  "texts": {
+   "vi": "Nhà hát Thành phố nằm giữa khu trung tâm, nổi bật với mặt tiền trang trí cầu kỳ và bậc thềm rộng. Đây là một địa điểm gắn với đời sống biểu diễn nghệ thuật của thành phố. Từ phía quảng trường, hãy quan sát cách các cột, vòm cửa và phù điêu tạo nên nhịp điệu cho mặt đứng. Nếu muốn vào xem biểu diễn, bạn cần tìm hiểu chương trình và quy định của đơn vị tổ chức trước chuyến đi.",
+   "en": "The Saigon Opera House stands in the city centre, recognised by its decorative facade and broad entrance steps. It is a landmark associated with the performing arts. From the square, notice how columns, arches and sculptural details shape the front of the building. To attend a performance, check the programme and the organiser’s admission arrangements before your visit.",
+   "ja": "市民劇場は、装飾豊かな正面と広い階段が印象的な建物です。街の舞台芸術と深く結びついています。広場から柱やアーチ、彫刻の細部を眺めてみてください。公演を見たい場合は、事前に演目や入場方法を確認しましょう。",
+   "zh": "西贡歌剧院位于市中心，以精美的外立面和宽阔的台阶吸引游客。请从广场观察柱子、拱门和雕塑细节组成的建筑节奏。",
+   "ko": "사이공 오페라 하우스는 장식적인 외관과 넓은 계단이 돋보이는 도심의 랜드마크입니다. 광장에서 기둥과 아치, 조각 장식의 조화를 살펴보세요."
+  },
+  "audio": {}
+ },
+ {
+  "id": "nguyen-hue",
+  "name": "Phố đi bộ Nguyễn Huệ",
+  "enName": "Nguyen Hue Walking Street",
+  "category": "culture",
+  "address": "Đường Nguyễn Huệ, TP.HCM",
+  "lat": 10.774,
+  "lon": 106.7038,
+  "art": "street",
+  "color": "#cfddd5",
+  "published": true,
+  "source": "https://visithcmc.net/en/news/du-lich-quan-1",
+  "texts": {
+   "vi": "Phố đi bộ Nguyễn Huệ là không gian để cảm nhận nhịp sống đô thị ở trung tâm Thành phố Hồ Chí Minh. Dọc tuyến phố, những công trình kiến trúc và các không gian sinh hoạt cộng đồng tạo nên nhiều góc nhìn khác nhau về Sài Gòn. Bạn có thể thong thả đi bộ, quan sát các tòa nhà và tìm một góc nghỉ chân. Không gian nơi đây thay đổi theo thời điểm và những hoạt động được tổ chức trong thành phố.",
+   "en": "Nguyen Hue Walking Street offers a place to experience daily urban life in central Ho Chi Minh City. Buildings, open spaces and community activities create different perspectives on Saigon. Take a gentle walk, look at the architecture and find a place to pause. The atmosphere changes with the time of day and the events taking place in the city.",
+   "ja": "グエンフエ歩行者通りでは、ホーチミン市の都市生活を感じることができます。建物や広場、街の活動がさまざまな景色を作り出しています。ゆっくり歩き、建築を眺め、ひと休みしてみましょう。時間帯やイベントによって雰囲気も変わります。",
+   "zh": "阜惠步行街让人感受胡志明市中心的城市节奏。沿街散步，观察建筑、广场和社区活动，找一个喜欢的角落休息。",
+   "ko": "응우옆4 보행자 거리는 호짜민시 중심의 도시 분위기를 느낄 수 있는 곳입니다. 천천히 걸으며 건축물과 광장, 시민들의 활동을 관찰해 보세요."
+  },
+  "audio": {}
+ },
+ {
+  "id": "bach-dang",
+  "name": "Bến Bạch Đằng",
+  "enName": "Bach Dang Riverside",
+  "category": "river",
+  "address": "Đường Tôn Đức Thắng, ven sông Sài Gòn, TP.HCM",
+  "lat": 10.7761,
+  "lon": 106.7088,
+  "art": "river",
+  "color": "#c8ddd9",
+  "published": true,
+  "source": "https://visithcmc.vn/vi/chao-mung-den-voi-thanh-pho-ho-chi-minh/",
+  "texts": {
+   "vi": "Bến Bạch Đằng mở ra một khoảng nhìn rộng bên sông Sài Gòn. Từ lối đi ven bờ, bạn có thể quan sát dòng sông, những con tàu và cảnh quan đô thị phía đối diện. Đây là nơi thích hợp để tạm dừng hành trình và cảm nhận một nhịp khác của thành phố. Nếu muốn trải nghiệm phương tiện đường thủy, hãy kiểm tra lịch chạy và thông tin vé trực tiếp với đơn vị cung cấp dịch vụ.",
+   "en": "Bach Dang Riverside opens onto the Saigon River. From the promenade, you can watch boats and look across the water towards the city skyline. It is a place to pause and experience a different rhythm of Ho Chi Minh City. If you would like to travel on the river, check schedules and ticket information directly with the service operator.",
+   "ja": "バクダン埠頭からはサイゴン川を広く見渡すことができます。川沿いの道を歩きながら、船や対岸の街並みを眺めてみましょう。街の違うリズムを感じられる場所です。水上交通を利用する場合は、運航会社に時刻や乗車券を確認してください。",
+   "zh": "白藤码头可以开阔地欣赏西贡河、船只和城市天际线。沿着河畔散步，停下来感受城市不同的节奏。",
+   "ko": "백당 강변에서는 사이공강과 배, 도시의 스케일라인을 한눈에 볼 수 있습니다. 강변을 천천히 걸으며 도시의 또 다른 리듬을 느껴 보세요."
+  },
+  "audio": {}
+ },
+ {
+  "id": "bao-tang-chung-tich-chien-tranh",
+  "name": "Bảo tàng Chứng tích Chiến tranh",
+  "enName": "War Remnants Museum",
+  "category": "historyCat",
+  "address": "28 Võ Văn Tần, TP.HCM",
+  "lat": 10.7794,
+  "lon": 106.6922,
+  "art": "museum",
+  "color": "#d9c8b8",
+  "published": true,
+  "source": "https://baotangchungtichchientranh.vn/",
+  "texts": {
+   "vi": "Bảo tàng Chứng tích Chiến tranh là nơi lưu giữ nhiều tư liệu, hình ảnh và hiện vật về những giai đoạn khó quên của lịch sử Việt Nam. Khi tham quan, bạn nên dành thời gian đọc chú thích và quan sát cách các câu chuyện được sắp xếp theo từng chủ đề. Đây là điểm đến giúp người nghe nhìn lại quá khứ với thái độ tôn trọng và suy ngẫm.",
+   "en": "The War Remnants Museum preserves documents, photographs and objects connected with important periods in Vietnam's history. Take time to read the captions and explore how the exhibits are arranged by theme. The museum offers a thoughtful place to learn about the past and reflect on the experiences of people affected by war.",
+   "ja": "戦争証跡博物館には、ベトナムの歴史に関わる資料や写真、現物が保存されています。展示の説明を読み、テーマごとの構成をゆっくり見てみましょう。過去を学び、戦争の影響を受けた人々について考えることができる場所です。",
+   "zh": "战争遗迹博物馆保存了越南历史的重要资料、照片和文物。参观时请认真阅读说明，以尊重和思考的态度了解过去。",
+   "ko": "전쟁박물관에는 베트남 역사의 중요한 자료와 사진, 유물이 보존되어 있습니다. 설명을 천천히 읽으며 과거를 존중하는 마음으로 전시를 관람해 보세요."
+  },
+  "audio": {}
+ },
+ {
+  "id": "landmark-81",
+  "name": "Landmark 81",
+  "enName": "Landmark 81",
+  "category": "architecture",
+  "address": "208 Nguyễn Hữu Cảnh, Bình Thạnh, TP.HCM",
+  "lat": 10.7951,
+  "lon": 106.7218,
+  "art": "tower",
+  "color": "#c7dce5",
+  "published": true,
+  "source": "https://vinpearl.com/vi/landmark-81",
+  "texts": {
+   "vi": "Landmark 81 là một điểm nhấn hiện đại trên đường chân trời Thành phố Hồ Chí Minh. Tòa nhà nổi bật với hình dáng vươn cao và vị trí bên sông, tạo nên một góc nhìn khác về tốc độ phát triển của đô thị. Từ khu vực xung quanh, bạn có thể quan sát sự tương phản giữa kiến trúc mới, dòng sông và những khu dân cư lân cận.",
+   "en": "Landmark 81 is a modern landmark on Ho Chi Minh City's skyline. Its tall form and riverside setting offer a different perspective on the city's rapid development. From the surrounding area, observe the contrast between new architecture, the river and nearby neighbourhoods.",
+   "ja": "ランドマーク81は、ホーチミン市のスカイラインを代表する現代的な建物です。川沿いにそびえる姿から、都市の発展を感じることができます。周辺から新しい建築、川、近隣の住宅地が作る景色の対比を眺めてみましょう。",
+   "zh": "Landmark 81 是胡志明市天际线上的现代地标。高耸的建筑、河流和周边社区共同展现了城市发展的活力。",
+   "ko": "랜드마크 81은 호짜민시 스케일라인을 대표하는 현대적인 건축물입니다. 높은 건물과 강, 주변 주거지가 도시의 빠른 발전을 보여 줍니다."
+  },
+  "audio": {}
+ },
+ {
+  "id": "chua-ngoc-hoang",
+  "name": "Chùa Ngọc Hoàng",
+  "enName": "Jade Emperor Pagoda",
+  "category": "culture",
+  "address": "73 Mai Thị Lựu, Đa Kao, TP.HCM",
+  "lat": 10.7905,
+  "lon": 106.6997,
+  "art": "pagoda",
+  "color": "#e3c6a9",
+  "published": true,
+  "source": "https://visithcmc.vn/vi/diem-den/chua-ngoc-hoang",
+  "texts": {
+   "vi": "Chùa Ngọc Hoàng là một không gian tín ngưỡng giàu màu sắc và nằm giữa khu dân cư yên tĩnh của quận 1. Những chi tiết trang trí, tượng thờ và làn khói hương tạo nên bầu không khí đặc biệt. Khi ghé thăm, hãy giữ giọng nói nhỏ, ăn mặc phù hợp và tôn trọng hoạt động tín ngưỡng của người địa phương.",
+   "en": "Jade Emperor Pagoda is a richly decorated place of worship in a quiet neighbourhood of District 1. Decorative details, statues and incense create a distinctive atmosphere. Visitors should speak softly, dress respectfully and be considerate of local religious activities.",
+   "ja": "玉皇殿は、1区の静かな住宅地にある色彩豊かな信仰の場所です。装飾や仏像、線香の香りが独特の雰囲気を作っています。訪れる時は静かに話し、適切な服装を選び、地域の信仰活動を尊重しましょう。",
+   "zh": "玉皇殿是一座色彩丰富的信仰场所，位于安静的居民区。参观时请保持安静、穿着得体，并尊重当地的宗教活动。",
+   "ko": "옥황사는 조용한 주거지에 자리한 화려한 사찰입니다. 방문할 때는 조용히 말하고 단정한 옷차림을 하며 지역의 종교 활동을 존중해 주세요."
+  },
+  "audio": {}
+ }
+]
