@@ -1,0 +1,16 @@
+{
+    "name": "saigon-echo-admin-backend",
+    "version": "1.0.0",
+    "private": true,
+    "type": "module",
+    "scripts": {
+        "dev": "node --watch server.js",
+        "start": "node server.js",
+        "admin:reset-password": "node reset-admin-password.js"
+    },
+    "dependencies": {
+        "dotenv": "^16.4.7",
+        "express": "^5.1.0",
+        "mssql": "^12.7.10"
+    }
+}
