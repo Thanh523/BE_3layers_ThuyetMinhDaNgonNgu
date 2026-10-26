@@ -12,6 +12,15 @@ export {
 } from './auth';
 export { getDashboard } from './dashboard';
 export {
+    clearHistory,
+    getFavorites,
+    getPublicPlaces,
+    getPublicPlace,
+    getUserHistory,
+    recordHistory,
+    setFavorite,
+} from './userData';
+export {
     createNarration,
     deleteNarration,
     getNarrations,

@@ -12,12 +12,13 @@ import PlacePicker from '../../components/shared/PlacePicker';
 import Modal from '../../components/shared/Modal';
 import ConfirmDialog from '../../components/shared/ConfirmDialog';
 import EmptyState from '../../components/shared/EmptyState';
+import { createAdminAudio, deleteAdminAudio, getAdminAudios, updateAdminAudio, uploadAdminMedia } from '../../services/adminContent';
 
-function AudioPlayer({ fileId }) {
+function AudioPlayer({ fileId, fileUrl }) {
     // HTML5 audio điều khiển thật với tệp lấy từ IndexedDB.
     const url = useFileUrl(fileId);
-    return url ? (
-        <audio controls preload="metadata" src={url} className="full-audio">
+    return fileUrl || url ? (
+        <audio controls preload="metadata" src={fileUrl || url} className="full-audio">
             Trình duyệt không hỗ trợ audio.
         </audio>
     ) : (
@@ -27,7 +28,7 @@ function AudioPlayer({ fileId }) {
     );
 }
 
-function AudioForm({ original, onClose, narrations, places }) {
+function AudioForm({ original, onClose, narrations, places, database, existingAudios, onSaved }) {
     const { data, add, update, notify } = useDemoData();
     const [narrationId, setNarrationId] = useState(
         original?.narrationId ||
@@ -36,7 +37,7 @@ function AudioForm({ original, onClose, narrations, places }) {
             )?.id ||
             '',
     );
-    const [title, setTitle] = useState(original?.title || '');
+    const [title, setTitle] = useState(original?.voiceName || original?.title || '');
     const [file, setFile] = useState(null);
     const [error, setError] = useState('');
     const [busy, setBusy] = useState(false);
@@ -60,7 +61,7 @@ function AudioForm({ original, onClose, narrations, places }) {
             return;
         }
         if (
-            data.audios.some(
+            existingAudios.some(
                 (audio) =>
                     audio.id !== original?.id &&
                     (audio.narrationId === narrationId ||
@@ -75,6 +76,28 @@ function AudioForm({ original, onClose, narrations, places }) {
         setBusy(true);
         let fileId;
         try {
+            if (database) {
+                if (!file) throw new Error('Hãy chọn tệp âm thanh để tải lên hoặc thay thế.');
+                const { fileUrl } = await uploadAdminMedia(file, 'audio');
+                if (original) {
+                    await updateAdminAudio(original.id, {
+                        fileUrl,
+                        voiceName: title.trim(),
+                        durationSeconds: 0,
+                    });
+                } else {
+                    await createAdminAudio({
+                        narrationId,
+                        fileUrl,
+                        voiceName: title.trim() || file.name,
+                        durationSeconds: 0,
+                    });
+                }
+                notify(original ? 'Đã thay âm thanh trong database.' : 'Đã lưu âm thanh vào database.');
+                await onSaved();
+                onClose();
+                return;
+            }
             if (file) {
                 fileId = newId('audiofile');
                 await putFile(fileId, file);
@@ -100,8 +123,8 @@ function AudioForm({ original, onClose, narrations, places }) {
                 });
             notify(original ? 'Đã cập nhật/thay thế âm thanh.' : 'Đã thêm bản thu âm thanh.');
             onClose();
-        } catch {
-            setError('Không lưu được tệp âm thanh. Hãy kiểm tra bộ nhớ trình duyệt.');
+        } catch (saveError) {
+            setError(saveError.message || 'Không lưu được tệp âm thanh. Hãy kiểm tra kết nối backend.');
         } finally {
             setBusy(false);
         }
@@ -116,6 +139,7 @@ function AudioForm({ original, onClose, narrations, places }) {
                 <select
                     value={narrationId}
                     required
+                    disabled={database && Boolean(original)}
                     onChange={(event) => setNarrationId(event.target.value)}
                 >
                     <option value="">Chọn bài thuyết minh</option>
@@ -138,7 +162,7 @@ function AudioForm({ original, onClose, narrations, places }) {
                 </div>
             )}
             <label className="field">
-                <span>Tên bản thu</span>
+                <span>Tên/giọng bản thu</span>
                 <input
                     value={title}
                     onChange={(e) => setTitle(e.target.value)}
@@ -148,7 +172,7 @@ function AudioForm({ original, onClose, narrations, places }) {
             </label>
             <label className="field">
                 <span>
-                    {original ? 'Thay thế tệp âm thanh (không bắt buộc)' : 'Tệp âm thanh *'}
+                    {original ? 'Thay thế tệp âm thanh (bắt buộc)' : 'Tệp âm thanh *'}
                 </span>
                 <input
                     ref={fileInput}
@@ -167,7 +191,7 @@ function AudioForm({ original, onClose, narrations, places }) {
             {original && (
                 <div className="audio-panel">
                     <strong>Nghe thử bản hiện tại</strong>
-                    <AudioPlayer fileId={original.fileId} />
+                    <AudioPlayer fileId={original.fileId} fileUrl={original.fileUrl} />
                 </div>
             )}
             {error && <p className="error-text">{error}</p>}
@@ -186,6 +210,7 @@ function AudioForm({ original, onClose, narrations, places }) {
 export default function AudiosPage() {
     const { data, removeMedia, notify } = useDemoData();
     const [databaseData, setDatabaseData] = useState(null);
+    const [databaseAudios, setDatabaseAudios] = useState(null);
     const [narrationsLoading, setNarrationsLoading] = useState(!IS_DEMO);
     const [narrationsError, setNarrationsError] = useState('');
     const [placeFilter, setPlaceFilter] = useState('');
@@ -197,7 +222,7 @@ export default function AudiosPage() {
         setNarrationsLoading(true);
         setNarrationsError('');
         try {
-            const result = await getNarrations();
+            const [result, audios] = await Promise.all([getNarrations(), getAdminAudios()]);
             if (!result || !Array.isArray(result.places) || !Array.isArray(result.narrations)) {
                 throw new Error('Dữ liệu thuyết minh từ backend không đúng cấu trúc.');
             }
@@ -209,6 +234,10 @@ export default function AudiosPage() {
                     placeName: placeNames.get(item.locationId) || item.locationId,
                 })),
             });
+            setDatabaseAudios(audios.map((item) => ({
+                ...item,
+                title: item.title || item.voiceName || 'Bản thu âm thanh',
+            })));
         } catch (error) {
             setNarrationsError(error.message || 'Không thể tải danh sách bài thuyết minh.');
         } finally {
@@ -218,22 +247,33 @@ export default function AudiosPage() {
     useEffect(() => {
         loadNarrations();
     }, [loadNarrations]);
-    const narrations = databaseData?.narrations || data.narrations;
-    const places = databaseData?.places || data.locations;
+    const narrations = IS_DEMO ? data.narrations : databaseData?.narrations || [];
+    const places = IS_DEMO ? data.locations : databaseData?.places || [];
+    const audios = IS_DEMO ? data.audios : databaseAudios || [];
     const filtered = useMemo(
         () =>
-            data.audios.filter(
+            audios.filter(
                 (item) =>
                     (!placeFilter || item.locationId === placeFilter) &&
                     (!langFilter || item.lang === langFilter),
             ),
-        [data.audios, placeFilter, langFilter],
+        [audios, placeFilter, langFilter],
     );
     const getPlace = (item) =>
         places.find((place) => place.id === item.locationId)?.name || '(Không có địa điểm)';
     const getLang = (value) => LANGUAGE_OPTIONS.find((x) => x.value === value)?.label || value;
     const del = async () => {
-        await removeMedia('audios', deleting.id);
+        if (!IS_DEMO) {
+            try {
+                await deleteAdminAudio(deleting.id);
+                await loadNarrations();
+            } catch (error) {
+                notify(error.message || 'Không thể xóa âm thanh.');
+                return;
+            }
+        } else {
+            await removeMedia('audios', deleting.id);
+        }
         setDeleting(null);
         notify('Đã xóa âm thanh.');
     };
@@ -317,7 +357,7 @@ export default function AudiosPage() {
                                     </div>
                                     <span className="lang-chip">{item.lang.toUpperCase()}</span>
                                 </div>
-                                <AudioPlayer fileId={item.fileId} />
+                                <AudioPlayer fileId={item.fileId} fileUrl={item.fileUrl} />
                                 <div className="audio-buttons">
                                     <button className="btn small" onClick={() => setEditing(item)}>
                                         <Pencil size={15} /> Chỉnh sửa
@@ -349,13 +389,16 @@ export default function AudiosPage() {
                         onClose={() => setEditing(undefined)}
                         narrations={narrations}
                         places={places}
+                        database={!IS_DEMO}
+                        existingAudios={audios}
+                        onSaved={loadNarrations}
                     />
                 </Modal>
             )}
             {deleting && (
                 <ConfirmDialog
                     title="Xóa bản ghi âm thanh?"
-                    text={`Bản thu “${deleting.title}” sẽ bị xóa khỏi trình duyệt demo.`}
+                    text={`Bản thu “${deleting.title}” sẽ bị xóa khỏi ${IS_DEMO ? 'trình duyệt demo' : 'database'}.`}
                     onCancel={() => setDeleting(null)}
                     onConfirm={del}
                 />

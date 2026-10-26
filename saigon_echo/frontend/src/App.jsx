@@ -15,6 +15,7 @@ import UserLayout from './layouts/UserLayout';
 import ExplorePage from './pages/User/ExplorePage';
 import SavedPage from './pages/User/SavedPage';
 import HistoryPage from './pages/User/HistoryPage';
+import UserExperiencePage from './pages/User/UserExperiencePage';
 import { getSession, SESSION_EVENT, startSessionActivity } from './services/api';
 
 function RequireAdmin({ children }) {
@@ -97,10 +98,12 @@ export default function App() {
     <Route path="/" element={<Navigate to="/kham-pha" replace />} />
     <Route path="/dang-nhap" element={<LoginPage />} />
     <Route path="/dang-ky" element={<RegisterPage />} />
+    <Route>
+      <Route path="/kham-pha" element={<UserExperiencePage />} />
+      <Route path="/yeu-thich" element={<UserExperiencePage />} />
+      <Route path="/lich-su" element={<UserExperiencePage />} />
+    </Route>
     <Route element={<UserLayout />}>
-      <Route path="/kham-pha" element={<ExplorePage />} />
-      <Route path="/yeu-thich" element={<SavedPage />} />
-      <Route path="/lich-su" element={<HistoryPage />} />
       <Route path="/tham-quan/:slug" element={<PublicPlacePage />} />
     </Route>
     <Route path="/admin" element={<RequireAdmin><AdminLayout /></RequireAdmin>}>

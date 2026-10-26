@@ -2,6 +2,7 @@ import { IS_AUTH_DEMO, request } from './client';
 
 const SESSION_KEY = 'saigon-echo-admin-session-v1';
 const SESSION_IDLE_TIMEOUT_MS = 30_000;
+const ADMIN_SESSION_IDLE_TIMEOUT_MS = 0;
 const ACTIVITY_CHECK_INTERVAL_MS = 1_000;
 
 export async function getSession() {
@@ -42,7 +43,7 @@ export async function login(username, password) {
     const user = { name: 'Quản trị viên', username: 'admin', role: 'admin' };
     sessionStorage.setItem(
         SESSION_KEY,
-        JSON.stringify({ user, expiresAt: Date.now() + SESSION_IDLE_TIMEOUT_MS }),
+        JSON.stringify({ user, expiresAt: Number.MAX_SAFE_INTEGER }),
     );
     return user;
 }
@@ -61,7 +62,7 @@ export function startSessionActivity(onExpired) {
 
     function registerActivity() {
         const now = Date.now();
-        if (now - lastActivityAt >= SESSION_IDLE_TIMEOUT_MS) {
+        if (ADMIN_SESSION_IDLE_TIMEOUT_MS && now - lastActivityAt >= ADMIN_SESSION_IDLE_TIMEOUT_MS) {
             expire();
             return;
         }
@@ -84,7 +85,7 @@ export function startSessionActivity(onExpired) {
 
     function checkSession() {
         const now = Date.now();
-        if (now - lastActivityAt >= SESSION_IDLE_TIMEOUT_MS) {
+        if (ADMIN_SESSION_IDLE_TIMEOUT_MS && now - lastActivityAt >= ADMIN_SESSION_IDLE_TIMEOUT_MS) {
             expire();
             return;
         }

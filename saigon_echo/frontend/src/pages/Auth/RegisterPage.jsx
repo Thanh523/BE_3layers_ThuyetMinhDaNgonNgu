@@ -8,7 +8,6 @@ export default function RegisterPage() {
   const navigate = useNavigate();
   const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
-  const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [confirmation, setConfirmation] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -56,7 +55,7 @@ export default function RegisterPage() {
     }
     setBusy(true);
     try {
-      await registerUser({ fullName, email, username, password });
+      await registerUser({ fullName, email, password });
       navigate('/kham-pha', { replace: true });
     } catch (registrationError) {
       setError(registrationError.message || 'Không thể tạo tài khoản. Vui lòng thử lại.');
@@ -70,10 +69,10 @@ export default function RegisterPage() {
       <section className="login-story" aria-label="Giới thiệu Sài Gòn Echo">
         <Link className="login-brand" to="/kham-pha" aria-label="Sài Gòn Echo">
           <span className="login-brand-mark" aria-hidden="true">◖</span>
-          <span><strong>Sài Gòn Echo</strong><small>STORIES AROUND YOU</small></span>
+          <span><strong>Sài Gòn Echo</strong><small>CÂU CHUYỆN QUANH BẠN</small></span>
         </Link>
         <div className="login-story-copy">
-          <span className="login-kicker">YOUR SAIGON JOURNEY</span>
+          <span className="login-kicker">HÀNH TRÌNH SÀI GÒN CỦA BẠN</span>
           <h1>Lưu lại những<br/>câu chuyện<br/><em>bạn yêu thích.</em></h1>
           <p>Tạo tài khoản để lưu địa điểm yêu thích và tiếp tục hành trình nghe của bạn.</p>
         </div>
@@ -104,10 +103,6 @@ export default function RegisterPage() {
             <label className="field auth-field">
               <span>Email <b>*</b></span>
               <input autoComplete="email" maxLength={254} onChange={(event) => setEmail(event.target.value)} placeholder="ban@example.com" required type="email" value={email}/>
-            </label>
-            <label className="field auth-field">
-              <span>Tên đăng nhập <b>*</b></span>
-              <input autoComplete="username" minLength={3} maxLength={50} onChange={(event) => setUsername(event.target.value)} placeholder="3–50 ký tự: chữ, số, dấu . _ -" required value={username}/>
             </label>
             <label className="field auth-field">
               <span>Mật khẩu <b>*</b></span>

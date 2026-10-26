@@ -1,5 +1,7 @@
 // Cấu hình chế độ chạy và gửi yêu cầu chung đến backend.
-export const IS_DEMO = !import.meta.env.VITE_API_URL;
+// Chỉ bật dữ liệu demo khi được yêu cầu rõ ràng. Khi chạy qua Vite proxy,
+// frontend vẫn phải gọi backend dù không khai báo VITE_API_URL.
+export const IS_DEMO = import.meta.env.VITE_DEMO_DATA === 'true';
 export const IS_STATS_DEMO =
     import.meta.env.DEV && import.meta.env.VITE_DEMO_STATS === 'true';
 export const IS_AUTH_DEMO =

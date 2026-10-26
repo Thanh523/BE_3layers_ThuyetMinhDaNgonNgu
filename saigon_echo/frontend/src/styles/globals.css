@@ -47,7 +47,7 @@ code { background: #edf1ec; padding: 2px 5px; border-radius: 4px; font-size: .9e
 .side-link span { flex: 1; }
 .side-link small { font-size: 10px; color: #b0c8ba; }
 .side-link:hover { background: #ffffff16; color: white; }
-.side-link.active { background: #f1f4e9; color: var(--deep); font-weight: 700; }
+.side-link.active { background: #f1f4e9; color: var(--deep); font-weight: 700; box-shadow: 0 1px 0 #ffffff55; }
 .side-link.active small { color: #547769; }
 .side-foot { margin: auto 22px 25px; border-top: 1px solid #ffffff25; padding-top: 21px; font-size: 11px; font-weight: 700; letter-spacing: 1px; }
 .demo-dot { background: #e9c27d; height: 7px; width: 7px; display: inline-block; margin-right: 8px; border-radius: 50%; }
@@ -239,7 +239,7 @@ code { background: #edf1ec; padding: 2px 5px; border-radius: 4px; font-size: .9e
 .login-story-copy h1 em { color: #f2ad79; font-family: inherit; font-weight: 400; }
 .login-story-copy p { max-width: 390px; margin: 0; color: #d3e0d8; font-size: 14px; line-height: 1.9; }
 .login-art-card { position: relative; width: min(100%, 440px); aspect-ratio: 1.62; margin: auto auto 0; overflow: hidden; border-radius: 34% 34% 14px 14px; background: #d5ded0; }
-.login-artwork { position: absolute; inset: 0; }
+.login-artwork { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
 .login-art-caption { position: absolute; right: 13px; bottom: 13px; left: 13px; display: flex; align-items: center; gap: 18px; min-height: 62px; padding: 10px 15px; border-radius: 9px; color: var(--ink); background: #fffef2ed; }
 .login-art-caption > span:last-child { display: grid; gap: 2px; }
 .login-art-caption strong { font-size: 12px; font-weight: 700; }

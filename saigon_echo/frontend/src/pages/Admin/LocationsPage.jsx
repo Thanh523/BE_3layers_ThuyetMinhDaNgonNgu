@@ -1,5 +1,5 @@
 // USE CASE: xem danh sách/chi tiết, tìm kiếm-lọc, thêm, sửa, xóa và ẩn/hiện địa điểm.
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { Eye, EyeOff, MapPin, Pencil, Plus, Search, Trash2 } from 'lucide-react';
 import { useDemoData, makeSlug, newId } from '../../contexts/DemoDataContext';
 import { CATEGORIES } from '../../data/seed';
@@ -8,25 +8,28 @@ import Modal from '../../components/shared/Modal';
 import ConfirmDialog from '../../components/shared/ConfirmDialog';
 import EmptyState from '../../components/shared/EmptyState';
 import MediaImage from '../../components/shared/MediaImage';
+import { createPlace, deletePlace, getAdminPlaces, updatePlace } from '../../services/places';
 
 const newDraft = {
     name: '',
     enName: '',
     address: '',
-    category: 'history',
+    category: 'historyCat',
     summary: '',
     visible: true,
 };
 
-function LocationForm({ original, onClose }) {
+function LocationForm({ original, onClose, onSaved }) {
     const { data, add, update, notify } = useDemoData();
     const [form, setForm] = useState(original ? { ...original } : { ...newDraft });
     const [error, setError] = useState('');
+    const [saving, setSaving] = useState(false);
     const set = (key, value) => setForm((prev) => ({ ...prev, [key]: value }));
 
     // Kiểm tra dữ liệu bắt buộc, tên/đường dẫn trùng nhau trước khi lưu.
-    const submit = (event) => {
+    const submit = async (event) => {
         event.preventDefault();
+        setError('');
         if (!form.name.trim() || !form.address.trim()) {
             setError('Vui lòng nhập tên và địa chỉ địa điểm.');
             return;
@@ -47,10 +50,39 @@ function LocationForm({ original, onClose }) {
             return;
         }
         const item = { ...form, name: form.name.trim(), address: form.address.trim(), slug };
-        if (original) update('locations', original.id, item);
-        else add('locations', { ...item, id: newId('loc'), artwork: 'palace', color: '#d5ded0' });
-        notify(original ? 'Đã cập nhật địa điểm.' : 'Đã thêm địa điểm mới.');
-        onClose();
+        setSaving(true);
+        try {
+            if (original) {
+                const result = await updatePlace(original.id, {
+                    name: item.name,
+                    address: item.address,
+                    category: item.category,
+                    visible: item.visible,
+                });
+                update('locations', original.id, result.location);
+            } else {
+                const result = await createPlace({
+                    name: item.name,
+                    address: item.address,
+                    category: item.category,
+                    visible: item.visible,
+                });
+                add('locations', {
+                    ...item,
+                    ...result.location,
+                    id: result.location.id || newId('loc'),
+                    artwork: 'palace',
+                    color: '#d5ded0',
+                });
+            }
+            await onSaved();
+            notify(original ? 'Đã cập nhật địa điểm.' : 'Đã lưu địa điểm vào database.');
+            onClose();
+        } catch (saveError) {
+            setError(saveError.message || 'Không thể lưu địa điểm vào database.');
+        } finally {
+            setSaving(false);
+        }
     };
 
     return (
@@ -74,7 +106,7 @@ function LocationForm({ original, onClose }) {
                         value={form.enName}
                         maxLength={120}
                         onChange={(e) => set('enName', e.target.value)}
-                        placeholder="English name"
+                        placeholder="Tên tiếng Anh"
                     />
                 </label>
             </div>
@@ -92,7 +124,14 @@ function LocationForm({ original, onClose }) {
             </label>
             <label className="field">
                 <span>Danh mục</span>
-                <select value={form.category} onChange={(e) => set('category', e.target.value)}>
+                <select
+                    required
+                    value={CATEGORIES.some((item) => item.value === form.category) ? form.category : ''}
+                    onChange={(e) => set('category', e.target.value)}
+                >
+                    <option value="" disabled>
+                        Chọn danh mục
+                    </option>
                     {CATEGORIES.map((item) => (
                         <option key={item.value} value={item.value}>
                             {item.label}
@@ -133,8 +172,8 @@ function LocationForm({ original, onClose }) {
                 <button type="button" className="btn" onClick={onClose}>
                     Hủy
                 </button>
-                <button className="btn primary" type="submit">
-                    {original ? 'Lưu thay đổi' : 'Thêm địa điểm'}
+                <button className="btn primary" type="submit" disabled={saving}>
+                    {saving ? 'Đang lưu...' : original ? 'Lưu thay đổi' : 'Thêm địa điểm'}
                 </button>
             </div>
         </form>
@@ -143,16 +182,44 @@ function LocationForm({ original, onClose }) {
 
 export default function LocationsPage() {
     const { data, update, removeLocation, notify } = useDemoData();
+    const [databaseLocations, setDatabaseLocations] = useState(null);
+    const [loadError, setLoadError] = useState('');
     const [search, setSearch] = useState('');
     const [status, setStatus] = useState('all');
     const [editing, setEditing] = useState(undefined);
     const [details, setDetails] = useState(null);
     const [deleting, setDeleting] = useState(null);
 
+    const loadDatabaseLocations = async () => {
+        setLoadError('');
+        try {
+            const places = await getAdminPlaces();
+            setDatabaseLocations(places);
+        } catch (error) {
+            setLoadError(error.message || 'Không thể tải địa điểm từ database.');
+        }
+    };
+    useEffect(() => {
+        let active = true;
+        getAdminPlaces()
+            .then((locations) => {
+                if (active) {
+                    setDatabaseLocations(locations);
+                    setLoadError('');
+                }
+            })
+            .catch((error) => {
+                if (active) setLoadError(error.message || 'Không thể tải địa điểm từ database.');
+            });
+        return () => { active = false; };
+    }, []);
+
+    const locations = databaseLocations || data.locations;
+
     // Lọc kết quả theo tên, tên tiếng Anh, địa chỉ và trạng thái ẩn/hiện.
     const rows = useMemo(
         () =>
-            data.locations.filter((item) => {
+            locations.filter((item) => {
                 const q = search.toLocaleLowerCase('vi');
                 return (
                     [item.name, item.enName, item.address].some((text) =>
@@ -161,21 +228,42 @@ export default function LocationsPage() {
                     (status === 'all' || (status === 'visible') === item.visible)
                 );
             }),
-        [data.locations, search, status],
+        [locations, search, status],
     );
 
-    const toggle = (item) => {
-        update('locations', item.id, { visible: !item.visible });
-        notify(item.visible ? 'Đã ẩn địa điểm.' : 'Đã hiển thị địa điểm.');
+    const toggle = async (item) => {
+        try {
+            const result = await updatePlace(item.id, {
+                name: item.name,
+                address: item.address,
+                category: item.category,
+                visible: !item.visible,
+            });
+            const updatedLocation = { ...item, ...result.location };
+            setDatabaseLocations((current) => current?.map((place) =>
+                place.id === item.id ? updatedLocation : place,
+            ) || current);
+            update('locations', item.id, updatedLocation);
+            notify(updatedLocation.visible ? 'Đã hiển thị địa điểm.' : 'Đã ẩn địa điểm.');
+        } catch (error) {
+            notify(error.message || 'Không thể thay đổi trạng thái địa điểm.');
+        }
     };
     const confirmDelete = async () => {
-        await removeLocation(deleting.id);
-        setDeleting(null);
-        notify('Đã xóa địa điểm cùng nội dung liên quan.');
+        try {
+            await deletePlace(deleting.id);
+            removeLocation(deleting.id);
+            setDatabaseLocations((current) => current?.filter((item) => item.id !== deleting.id) || current);
+            setDeleting(null);
+            notify('Đã xóa địa điểm cùng nội dung liên quan trong database.');
+        } catch (error) {
+            notify(error.message || 'Không thể xóa địa điểm.');
+        }
     };
 
     return (
         <>
+            {loadError && <p className="error-text" role="alert">{loadError}</p>}
             <PageHeader
                 kicker="NỘI DUNG / 01"
                 title="Quản lý địa điểm"
@@ -188,13 +276,13 @@ export default function LocationsPage() {
             />
             <div className="metric-line">
                 <span>
-                    <strong>{data.locations.length}</strong> địa điểm
+                    <strong>{locations.length}</strong> địa điểm
                 </span>
                 <span>
-                    <strong>{data.locations.filter((x) => x.visible).length}</strong> đang hiển thị
+                    <strong>{locations.filter((x) => x.visible).length}</strong> đang hiển thị
                 </span>
                 <span>
-                    <strong>{data.locations.filter((x) => !x.visible).length}</strong> đã ẩn
+                    <strong>{locations.filter((x) => !x.visible).length}</strong> đã ẩn
                 </span>
             </div>
             <section className="panel">
@@ -282,7 +370,11 @@ export default function LocationsPage() {
                     onClose={() => setEditing(undefined)}
                     wide
                 >
-                    <LocationForm original={editing} onClose={() => setEditing(undefined)} />
+                    <LocationForm
+                        original={editing}
+                        onClose={() => setEditing(undefined)}
+                        onSaved={loadDatabaseLocations}
+                    />
                 </Modal>
             )}
             {details && (
@@ -297,7 +389,7 @@ export default function LocationsPage() {
                     </p>
                     <p>
                         <b>Danh mục:</b>{' '}
-                        {CATEGORIES.find((c) => c.value === details.category)?.label}
+                        {CATEGORIES.find((c) => c.value === details.category)?.label || 'Chưa phân loại'}
                     </p>
                     <p>
                         <b>Mô tả:</b> {details.summary || 'Chưa có'}

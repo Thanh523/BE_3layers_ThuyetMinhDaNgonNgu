@@ -51,21 +51,13 @@ export default function AdminLayout() {
   return <div className={`app-shell ${sidebarCollapsed ? 'sidebar-collapsed' : ''}`}>
     {mobileOpen && <button className="drawer-scrim" onClick={() => setMobileOpen(false)} aria-label="Đóng menu" />}
     <aside id="admin-sidebar" className={`sidebar ${mobileOpen ? 'open' : ''}`}>
-      <div className="side-brand"><div className="brand-symbol">◖</div><div><strong>Sài Gòn Echo</strong><small>STORIES AROUND YOU</small></div><button className="icon-button close-mobile" onClick={() => setMobileOpen(false)} aria-label="Đóng"><X size={18}/></button></div>
+      <div className="side-brand"><div className="brand-symbol">◖</div><div><strong>Sài Gòn Echo</strong><small>CÂU CHUYỆN QUANH BẠN</small></div><button className="icon-button close-mobile" onClick={() => setMobileOpen(false)} aria-label="Đóng"><X size={18}/></button></div>
       <div className="side-caption">KHÔNG GIAN QUẢN TRỊ</div>
       <nav className="side-nav" aria-label="Chức năng quản trị">
         {MENU.map(item => <NavLink key={item.to} to={item.to} onClick={() => setMobileOpen(false)} className={({ isActive }) => `side-link ${isActive ? 'active' : ''}`}>
           <item.icon size={19}/><span>{item.label}</span><small>{item.code}</small>
         </NavLink>)}
       </nav>
-      <div className="side-foot">
-        <div className="demo-dot"/> {IS_DEMO
-          ? IS_AUTH_DEMO ? 'DỮ LIỆU DEMO · ĐĂNG NHẬP DB' : 'CHẾ ĐỘ FE DEMO'
-          : 'XÁC THỰC BACKEND'}
-        <p>{IS_DEMO
-          ? 'Dữ liệu lưu trên trình duyệt hiện tại.'
-          : 'Thuyết minh dùng backend; địa điểm, ảnh, âm thanh và QR vẫn lưu trên trình duyệt.'}</p>
-      </div>
     </aside>
     <div className="workspace">
       <header className="topbar"><button

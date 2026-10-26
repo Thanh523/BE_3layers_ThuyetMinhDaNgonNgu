@@ -1,7 +1,16 @@
 // Dữ liệu demo cục bộ cho các chức năng chưa có API ghi tương ứng ở backend.
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
+import { useLocation } from 'react-router-dom';
 import { loadData, saveData } from '../services/storage';
 import { deleteFile } from '../services/fileStore';
+import {
+  clearHistory as clearRemoteHistory,
+  getFavorites,
+  getPublicPlaces,
+  getUserHistory,
+  recordHistory,
+  setFavorite,
+} from '../services/api';
 
 const DemoDataContext = createContext(null);
 const FAVORITES_KEY_PREFIX = 'saigonecho-user-favorites-v1';
@@ -20,7 +29,9 @@ function loadUserList(key) {
 }
 
 export function DemoDataProvider({ children }) {
+  const route = useLocation();
   const [data, setData] = useState(loadData);
+  const [publicPlaces, setPublicPlaces] = useState(null);
   const [accountScope, setAccountScopeState] = useState('guest');
   const accountScopeRef = useRef('guest');
   const [favorites, setFavorites] = useState([]);
@@ -38,6 +49,18 @@ export function DemoDataProvider({ children }) {
     try { saveData(data); }
     catch { showMessage('Không lưu được dữ liệu: trình duyệt có thể đang đầy bộ nhớ hoặc tắt lưu trữ.'); }
   }, [data]);
+
+  useEffect(() => {
+    if (route.pathname.startsWith('/admin')) return undefined;
+    let active = true;
+    getPublicPlaces().then((places) => {
+      if (!active || !Array.isArray(places)) return;
+      setPublicPlaces(places);
+    }).catch(() => {
+      // Giữ dữ liệu demo để frontend vẫn có thể khởi động khi backend chưa chạy.
+    });
+    return () => { active = false; };
+  }, [route.pathname]);
 
   useEffect(() => {
     if (accountScope === 'guest') return;
@@ -73,12 +96,26 @@ export function DemoDataProvider({ children }) {
       : loadUserList(`${HISTORY_KEY_PREFIX}:${nextScope}`));
     setAccountScopeState(nextScope);
   }, []);
+  useEffect(() => {
+    if (accountScope === 'guest') return undefined;
+    let active = true;
+    Promise.all([getFavorites(), getUserHistory()]).then(([remoteFavorites, remoteHistory]) => {
+      if (!active) return;
+      if (Array.isArray(remoteFavorites)) setFavorites(remoteFavorites);
+      if (Array.isArray(remoteHistory)) setHistory(remoteHistory);
+    }).catch((error) => {
+      if (active) showMessage(error.message || 'Không thể tải dữ liệu tài khoản.');
+    });
+    return () => { active = false; };
+  }, [accountScope]);
   const toggleFavorite = useCallback((placeId) => {
     if (accountScope === 'guest') return;
     setFavorites((current) => {
-      return current.includes(placeId)
-        ? current.filter((id) => id !== placeId)
-        : [...current, placeId];
+      const saved = !current.includes(placeId);
+      setFavorite(placeId, saved).catch((error) => showMessage(error.message || 'Không thể lưu địa điểm.'));
+      return saved
+        ? [...current, placeId]
+        : current.filter((id) => id !== placeId);
     });
   }, [accountScope]);
   const addHistory = useCallback((placeId, lang) => {
@@ -90,10 +127,12 @@ export function DemoDataProvider({ children }) {
       time: new Date().toISOString().replace(/Z$/, ''),
     };
     setHistory((current) => [entry, ...current].slice(0, 100));
+    recordHistory(placeId, lang).catch((error) => showMessage(error.message || 'Không thể lưu lịch sử nghe.'));
   }, [accountScope]);
   const clearHistory = useCallback(() => {
     if (accountScope === 'guest') return;
     setHistory([]);
+    clearRemoteHistory().catch((error) => showMessage(error.message || 'Không thể xóa lịch sử nghe.'));
     showMessage('Đã xóa lịch sử nghe.');
   }, [accountScope]);
 
@@ -151,6 +190,7 @@ export function DemoDataProvider({ children }) {
 
   const value = useMemo(() => ({
     data,
+    publicPlaces,
     add,
     update,
     remove,
@@ -166,7 +206,7 @@ export function DemoDataProvider({ children }) {
     history,
     addHistory,
     clearHistory,
-  }), [data, notify, accountScope, setAccountScope, favorites, toggleFavorite, history, addHistory, clearHistory]);
+  }), [data, publicPlaces, notify, accountScope, setAccountScope, favorites, toggleFavorite, history, addHistory, clearHistory]);
   return <DemoDataContext.Provider value={value}>{children}{message && <div className="toast" role="status"><span>{message}</span><button onClick={dismiss} aria-label="Đóng thông báo">×</button></div>}</DemoDataContext.Provider>;
 }
 

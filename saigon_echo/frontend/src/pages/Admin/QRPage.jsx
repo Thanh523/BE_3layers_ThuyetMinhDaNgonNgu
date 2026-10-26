@@ -9,6 +9,9 @@ import PlacePicker from '../../components/shared/PlacePicker';
 import ConfirmDialog from '../../components/shared/ConfirmDialog';
 import Modal from '../../components/shared/Modal';
 import EmptyState from '../../components/shared/EmptyState';
+import { IS_DEMO } from '../../services/api';
+import { createAdminQr, deleteAdminQr, getAdminQrs } from '../../services/adminContent';
+import { getAdminPlaces } from '../../services/places';
 
 function QRPreview({ place }) {
     const [src, setSrc] = useState('');
@@ -64,31 +67,67 @@ function QRPreview({ place }) {
 
 export default function QRPage() {
     const { data, add, remove, notify } = useDemoData();
+    const [databasePlaces, setDatabasePlaces] = useState(null);
+    const [databaseQrs, setDatabaseQrs] = useState(null);
+    const [loadError, setLoadError] = useState('');
+    const [loading, setLoading] = useState(!IS_DEMO);
     const [selection, setSelection] = useState('');
     const [filter, setFilter] = useState('');
     const [preview, setPreview] = useState(null);
     const [deleting, setDeleting] = useState(null);
     const [copied, setCopied] = useState('');
+    const loadDatabaseQrs = async () => {
+        setLoading(true);
+        setLoadError('');
+        try {
+            const [places, qrs] = await Promise.all([getAdminPlaces(), getAdminQrs()]);
+            setDatabasePlaces(places);
+            setDatabaseQrs(qrs);
+        } catch (error) {
+            setLoadError(error.message || 'Không thể tải danh sách mã QR từ database.');
+        } finally {
+            setLoading(false);
+        }
+    };
+    useEffect(() => {
+        if (!IS_DEMO) loadDatabaseQrs();
+    }, []);
+    const places = IS_DEMO ? data.locations : databasePlaces || [];
+    const qrs = IS_DEMO ? data.qrs : databaseQrs || [];
     const list = useMemo(
-        () => data.qrs.filter((item) => !filter || item.locationId === filter),
-        [data.qrs, filter],
+        () => qrs.filter((item) => !filter || item.locationId === filter),
+        [qrs, filter],
     );
-    const getPlace = (locationId) => data.locations.find((p) => p.id === locationId);
+    const getPlace = (locationId) => places.find((p) => p.id === locationId);
 
     // Không tạo QR trùng địa điểm. Nếu đã có thì chuyển thẳng đến xem trước.
-    const create = () => {
+    const create = async () => {
         if (!selection) return notify('Hãy chọn địa điểm cần tạo mã QR.');
         const place = getPlace(selection);
         if (!place?.visible)
             return notify('Địa điểm đang ẩn. Hãy hiển thị địa điểm trước khi tạo QR.');
-        const exists = data.qrs.some((q) => q.locationId === selection);
-        if (!exists)
+        const exists = qrs.some((q) => q.locationId === selection);
+        if (exists) {
+            notify('Địa điểm đã có mã QR; đang mở xem trước.');
+            setPreview(place);
+            setSelection('');
+            return;
+        }
+        if (IS_DEMO) {
             add('qrs', {
                 id: newId('qr'),
                 locationId: selection,
                 createdAt: new Date().toISOString(),
             });
-        notify(exists ? 'Địa điểm đã có mã QR; đang mở xem trước.' : 'Đã tạo mã QR mới.');
+        } else {
+            try {
+                await createAdminQr({ locationId: selection, label: place.name });
+                await loadDatabaseQrs();
+            } catch (error) {
+                return notify(error.message || 'Không thể tạo mã QR trong database.');
+            }
+        }
+        notify('Đã tạo mã QR mới.');
         setPreview(place);
         setSelection('');
     };
@@ -101,10 +140,20 @@ export default function QRPage() {
             notify('Không thể sao chép tự động. Hãy sao chép liên kết ở ô URL.');
         }
     };
-    const doDelete = () => {
-        remove('qrs', deleting.id);
+    const doDelete = async () => {
+        if (IS_DEMO) {
+            remove('qrs', deleting.id);
+        } else {
+            try {
+                await deleteAdminQr(deleting.id);
+                await loadDatabaseQrs();
+            } catch (error) {
+                notify(error.message || 'Không thể xóa mã QR khỏi database.');
+                return;
+            }
+        }
         setDeleting(null);
-        notify('Đã xóa mục quản lý QR. Liên kết cũ vẫn có thể mở nếu địa điểm còn hiển thị.');
+        notify('Đã xóa mã QR. Liên kết cũ vẫn có thể mở nếu địa điểm còn hiển thị.');
     };
 
     return (
@@ -124,12 +173,12 @@ export default function QRPage() {
                         Mã QR sẽ mở trang thuyết minh công khai của địa điểm. Dùng mã thật để demo
                         trên điện thoại khi máy chủ có thể truy cập được.
                     </p>
-                    <PlacePicker label="Chọn địa điểm" value={selection} onChange={setSelection} />
-                    <button className="btn primary full-width" onClick={create}>
+                    <PlacePicker label="Chọn địa điểm" places={places} value={selection} onChange={setSelection} />
+                    <button className="btn primary full-width" onClick={create} disabled={loading || !selection}>
                         <Plus size={17} /> Tạo mã QR
                     </button>
                     <p className="helper">
-                        Địa điểm phải ở trạng thái hiển thị để khách mở nội dung.
+                        Chỉ địa điểm đang hiển thị và đã có bài thuyết minh mới tạo được QR.
                     </p>
                 </section>
                 <section className="panel qr-explain">
@@ -148,9 +197,7 @@ export default function QRPage() {
                         <span>Khách quét mã → chọn ngôn ngữ → đọc/nghe thuyết minh</span>
                     </div>
                     <div className="qr-caption">
-                        Trang tham quan demo được tạo từ dữ liệu đang lưu trên cùng trình duyệt.
-                        Truy cập từ điện thoại khác chỉ có dữ liệu mẫu, chưa đồng bộ nội dung đã
-                        sửa.
+                        Mã QR trỏ đến trang công khai của địa điểm trên website hiện tại.
                     </div>
                 </section>
             </div>
@@ -160,9 +207,11 @@ export default function QRPage() {
                         <h2>Danh sách mã QR</h2>
                         <p>Quản lý các địa điểm đã tạo mã.</p>
                     </div>
-                    <PlacePicker value={filter} onChange={setFilter} all />
+                    <PlacePicker places={places} value={filter} onChange={setFilter} all />
                 </div>
-                {list.length ? (
+                {loadError && <p className="error-text" role="alert">{loadError}</p>}
+                {loading ? <EmptyState text="Đang tải mã QR từ database…" /> : null}
+                {!loading && list.length ? (
                     <div className="qr-table">
                         {list.map((item) => {
                             const place = getPlace(item.locationId);
@@ -221,9 +270,9 @@ export default function QRPage() {
                             );
                         })}
                     </div>
-                ) : (
+                ) : !loading && !loadError ? (
                     <EmptyState text="Chưa có mã QR nào. Hãy tạo mã cho một địa điểm đang hiển thị." />
-                )}
+                ) : null}
             </section>
             {preview && (
                 <Modal title="Xem trước mã QR" onClose={() => setPreview(null)}>

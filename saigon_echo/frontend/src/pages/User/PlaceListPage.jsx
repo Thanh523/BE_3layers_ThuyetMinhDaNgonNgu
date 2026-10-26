@@ -39,7 +39,7 @@ export default function PlaceListPage({
       {showHero && (
         <section className="user-hero">
           <div className="user-hero-copy">
-            <div className="eyebrow">SAIGON, IN YOUR LANGUAGE</div>
+            <div className="eyebrow">SÀI GÒN, THEO NGÔN NGỮ CỦA BẠN</div>
             <h1>Nghe thành phố<br/><em>kể chuyện.</em></h1>
             <p>Từ những mái ngói trăm năm đến nhịp sống bên sông. Chọn ngôn ngữ của bạn và để Sài Gòn dẫn lối.</p>
             <div className="user-hero-actions">

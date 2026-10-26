@@ -6,7 +6,7 @@ import { CATS } from '../pages/User/pageData';
 import { getUserSession, logoutUser, SESSION_EVENT, startUserSessionActivity } from '../services/api';
 
 export default function UserLayout() {
-  const { data, accountScope, setAccountScope, favorites, toggleFavorite, history, clearHistory, notify } = useDemoData();
+  const { data, publicPlaces, accountScope, setAccountScope, favorites, toggleFavorite, history, clearHistory, notify } = useDemoData();
   const [category, setCategory] = useState('all');
   const [query, setQuery] = useState('');
   const [sort, setSort] = useState('featured');
@@ -92,7 +92,7 @@ export default function UserLayout() {
     }
   };
 
-  const places = useMemo(() => data.locations
+  const places = useMemo(() => publicPlaces || data.locations
     .filter((place) => place.visible)
     .map((place) => {
       const narrations = data.narrations.filter(
@@ -102,7 +102,7 @@ export default function UserLayout() {
         ...place,
         texts: Object.fromEntries(narrations.map((item) => [item.lang, item.text || ''])),
       };
-    }), [data.locations, data.narrations]);
+    }), [data.locations, data.narrations, publicPlaces]);
 
   const openPlace = (place) => {
     if (!place?.slug) {
@@ -141,7 +141,7 @@ export default function UserLayout() {
       <header className="user-header">
         <Link className="user-brand" to="/kham-pha" aria-label="Sài Gòn Echo - Khám phá">
           <span className="brand-symbol">◖</span>
-          <span><strong>Sài Gòn Echo</strong><small>STORIES AROUND YOU</small></span>
+          <span><strong>Sài Gòn Echo</strong><small>CÂU CHUYỆN QUANH BẠN</small></span>
         </Link>
         <nav className="user-nav" aria-label="Điều hướng chính">
           <NavLink to="/kham-pha"><Compass size={16}/>Khám phá</NavLink>

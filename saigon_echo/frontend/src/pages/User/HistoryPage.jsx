@@ -7,7 +7,7 @@ export default function HistoryPage() {
   return (
     <section className="user-history-page">
       <div className="user-section-head">
-        <div><div className="eyebrow">YOUR JOURNEY</div><h1>Lịch sử nghe</h1><p>Các câu chuyện bạn đã bắt đầu nghe trên thiết bị này.</p></div>
+        <div><div className="eyebrow">HÀNH TRÌNH CỦA BẠN</div><h1>Lịch sử nghe</h1><p>Các câu chuyện bạn đã bắt đầu nghe trên thiết bị này.</p></div>
         {hist.length > 0 && <button type="button" className="btn small" onClick={clearHistory}>Xóa lịch sử</button>}
       </div>
       <div className="user-history-list">

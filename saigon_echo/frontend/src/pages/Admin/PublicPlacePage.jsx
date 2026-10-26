@@ -1,14 +1,16 @@
 // Trang công khai nhỏ để kiểm thử mã QR; dữ liệu hiện đọc từ kho demo trên trình duyệt.
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { ArrowLeft, AudioLines, BookOpen, MapPin } from 'lucide-react';
 import { Link, useParams } from 'react-router-dom';
 import { useDemoData } from '../../contexts/DemoDataContext';
+import { getPublicPlace } from '../../services/api';
 import { LANGUAGE_OPTIONS } from '../../data/seed';
 import MediaImage from '../../components/shared/MediaImage';
 import useFileUrl from '../../hooks/useFileUrl';
 
 function NarrationAudio({ audio, onPlay }) {
-    const url = useFileUrl(audio?.fileId);
+    const localUrl = useFileUrl(audio?.fileId);
+    const url = audio?.url || audio?.fileUrl || localUrl;
     return url ? (
         <audio className="full-audio" controls src={url} preload="metadata" onPlay={onPlay} />
     ) : (
@@ -20,20 +22,32 @@ export default function PublicPlacePage() {
     const { slug } = useParams();
     const { data, addHistory } = useDemoData();
     const [lang, setLang] = useState('vi');
-    const place = data.locations.find((item) => item.slug === slug);
+    const [databasePlace, setDatabasePlace] = useState(null);
+    const [loadError, setLoadError] = useState('');
+    useEffect(() => {
+        let active = true;
+        getPublicPlace(slug)
+            .then((result) => active && setDatabasePlace(result.place))
+            .catch((error) => active && setLoadError(error.message || 'Không thể tải địa điểm.'));
+        return () => { active = false; };
+    }, [slug]);
+    const place = databasePlace || data.locations.find((item) => item.slug === slug);
     const narration = useMemo(
         () =>
-            data.narrations.find(
-                (item) =>
-                    item.locationId === place?.id && item.lang === lang && item.visible !== false,
-            ),
-        [data.narrations, place?.id, lang],
+            databasePlace?.narrations?.find((item) => item.lang === lang)
+                || data.narrations.find(
+                    (item) =>
+                        item.locationId === place?.id && item.lang === lang && item.visible !== false,
+                ),
+        [databasePlace, data.narrations, place?.id, lang],
     );
-    const audio = data.audios.find(
+    const audio = narration?.audio || data.audios.find(
         (item) =>
             item.narrationId === narration?.id ||
             (!item.narrationId && item.locationId === place?.id && item.lang === lang),
     );
+    if (loadError && !place)
+        return <div className="not-found"><h1>Không thể tải địa điểm</h1><p>{loadError}</p></div>;
     if (!place || !place.visible)
         return (
             <div className="not-found">
@@ -50,7 +64,7 @@ export default function PublicPlacePage() {
                 <div className="public-brand">
                     <span className="brand-symbol">◖</span>
                     <strong>
-                        Sài Gòn Echo<small>STORIES AROUND YOU</small>
+                        Sài Gòn Echo<small>CÂU CHUYỆN QUANH BẠN</small>
                     </strong>
                 </div>
                 <Link to="/kham-pha" className="btn small">
@@ -62,7 +76,11 @@ export default function PublicPlacePage() {
                 <h1>{place.name}</h1>
                 <p className="public-subheading">{place.enName}</p>
                 <div className="public-banner">
-                    <MediaImage place={place} />
+                    {place.images?.[0]?.url ? (
+                        <img src={place.images[0].url} alt={place.name} />
+                    ) : (
+                        <MediaImage place={place} />
+                    )}
                 </div>
                 <p className="public-address">
                     <MapPin size={17} />
@@ -100,8 +118,7 @@ export default function PublicPlacePage() {
                     />
                 </section>
                 <div className="demo-disclaimer">
-                    Trang tham quan hiện sử dụng dữ liệu demo lưu trên trình duyệt; nội dung chưa
-                    được đồng bộ với SQL Server.
+                    Nội dung trang này được tải trực tiếp từ dữ liệu công khai trong SQL Server.
                 </div>
             </main>
             <footer className="public-footer">

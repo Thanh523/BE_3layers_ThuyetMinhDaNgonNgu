@@ -1,12 +1,12 @@
 import dotenv from 'dotenv';
-import sql from 'mssql';
+import sql from 'mssql/tedious.js';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 dotenv.config({ path: resolve(dirname(fileURLToPath(import.meta.url)), '.env') });
-export { default as sql } from 'mssql';
+export { sql };
 
-const required = ['DB_SERVER', 'DB_DATABASE', 'DB_USER', 'DB_PASSWORD'];
+const required = ['DB_SERVER', 'DB_DATABASE'];
 
 function envBoolean(name, defaultValue) {
     const value = process.env[name];
@@ -33,6 +33,19 @@ const config = {
     },
 };
 
+const windowsConfig = {
+    server: process.env.DB_SERVER,
+    database: process.env.DB_DATABASE,
+    driver: process.env.DB_ODBC_DRIVER || 'ODBC Driver 17 for SQL Server',
+    connectionTimeout: 15000,
+    requestTimeout: 15000,
+    pool: config.pool,
+    options: {
+        trustedConnection: true,
+        trustServerCertificate: envBoolean('DB_TRUST_SERVER_CERTIFICATE', true),
+    },
+};
+
 let poolPromise;
 
 export function getPool() {
@@ -41,7 +54,11 @@ export function getPool() {
         if (missing.length) {
             throw new Error(`Thiếu biến môi trường SQL Server: ${missing.join(', ')}`);
         }
-        poolPromise = sql.connect(config).catch((error) => {
+        const connectionConfig = process.env.DB_AUTH === 'windows' ? windowsConfig : config;
+        const connect = process.env.DB_AUTH === 'windows'
+            ? import('mssql/msnodesqlv8.js').then(({ default: windowsSql }) => windowsSql.connect(connectionConfig))
+            : sql.connect(connectionConfig);
+        poolPromise = connect.catch((error) => {
             poolPromise = undefined;
             throw error;
         });
